@@ -11,14 +11,19 @@
 
 //==============================================================================
 VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+    : AudioProcessorEditor (&p), audioProcessor (p) , Tab(juce::TabbedButtonBar::Orientation::TabsAtTop)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (1000, 750);
 	Themes(1);						// Initalise Theme Function
 
+
+	addAndMakeVisible(Tab);
+	Tab.addTab("Blank", juce::Colours::hotpink, new Component(), true);
+
 	C74_GENPLUGIN::setparameter(0,9,100,0);
+	
 
 	// Going through Slider Vector
 	for (auto i = 0; i < Sliders.size(); i++)
@@ -110,6 +115,10 @@ void  VIVI_SynthAudioProcessorEditor::Themes(int SelectedTheme)
 
 		break;
 	case 2:
+
+		OtherLookAndFeel.setColour(juce::Slider::thumbColourId, juce::Colours::purple);
+		OtherLookAndFeel.setColour(juce::Slider::backgroundColourId, juce::Colours::white);
+
 		break;
 	case 3:
 		break;
@@ -126,5 +135,5 @@ void  VIVI_SynthAudioProcessorEditor::Themes(int SelectedTheme)
 
 void VIVI_SynthAudioProcessorEditor::resized()
 {
-
+	Tab.setBounds(getLocalBounds().reduced(20));
 }

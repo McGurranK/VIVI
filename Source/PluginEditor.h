@@ -31,6 +31,8 @@ public:
 
 
 private:
+	juce::TabbedComponent Tab;
+
 	juce::LookAndFeel_V4 OtherLookAndFeel;
 
 	// All Buttons
