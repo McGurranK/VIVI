@@ -15,19 +15,26 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (1000, 750);
+	setSize(1000, 1000);
+	
 	Themes(1);						// Initalise Theme Function
 
-
 	addAndMakeVisible(Tab);
-	Tab.addTab("Blank", juce::Colours::hotpink, new Component(), true);
 
-	C74_GENPLUGIN::setparameter(0,9,100,0);
-	
+	Tab.setAccessible(true);
+
+	Tab.addTab("Oscillator Page", juce::Colours::hotpink, true);
+
+	Tab.addTab("Effects Page", juce::Colours::blue, new Component(), true);
+
+	Tab.addTab("Settings Page", juce::Colours::orange, new Component(), true);
+
+
 
 	// Going through Slider Vector
 	for (auto i = 0; i < Sliders.size(); i++)
 	{
+		T
 		addAndMakeVisible(Sliders[i]);		// Make all Sliders Visible
 		Sliders[i]->setValue(0.00);			// Set Default Value
 		Sliders[i]->setAccessible(true);	// Accessible Functions are on for all sliders
@@ -68,7 +75,7 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 			Sliders[i]->setRange(0.00,4.00);
 
 		}
-		*/
+		 */
 		Osc1.setTitle("Oscilator One");
 		Osc2.setTitle("Oscilator Two");
 		Osc3.setTitle("Oscilator Three"); 		
@@ -78,6 +85,7 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 		
 
 	}
+
 
 	  
 	 
@@ -91,6 +99,8 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 	Button[1]->setBounds(getWidth()-224, TopMargin+SliderHeight+350 , 200, 200);
 	
 }
+
+
 
 VIVI_SynthAudioProcessorEditor::~VIVI_SynthAudioProcessorEditor()
 {
