@@ -23,18 +23,18 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 
 	Tab.setAccessible(true);
 
-	Tab.addTab("Oscillator Page", juce::Colours::hotpink, true);
+	Tab.addTab("Oscillator Page", juce::Colours::hotpink,new OscillatorPage(), true);
 
 	Tab.addTab("Effects Page", juce::Colours::blue, new Component(), true);
 
 	Tab.addTab("Settings Page", juce::Colours::orange, new Component(), true);
 
 
-
+	/*
 	// Going through Slider Vector
 	for (auto i = 0; i < Sliders.size(); i++)
 	{
-		T
+
 		addAndMakeVisible(Sliders[i]);		// Make all Sliders Visible
 		Sliders[i]->setValue(0.00);			// Set Default Value
 		Sliders[i]->setAccessible(true);	// Accessible Functions are on for all sliders
@@ -75,7 +75,7 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 			Sliders[i]->setRange(0.00,4.00);
 
 		}
-		 */
+		 
 		Osc1.setTitle("Oscilator One");
 		Osc2.setTitle("Oscilator Two");
 		Osc3.setTitle("Oscilator Three"); 		
@@ -85,9 +85,10 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 		
 
 	}
+	*/
 
 
-	  
+	 /*
 	 
 	for (auto j = 0; j < Button.size(); j++)
 	{
@@ -97,14 +98,13 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 
 	Button[0]->setBounds(getWidth()-224, TopMargin +SliderHeight+ 50, 200, 200);
 	Button[1]->setBounds(getWidth()-224, TopMargin+SliderHeight+350 , 200, 200);
-	
+	*/
 }
-
-
 
 VIVI_SynthAudioProcessorEditor::~VIVI_SynthAudioProcessorEditor()
 {
 }
+
 
 //==============================================================================
 void VIVI_SynthAudioProcessorEditor::paint(juce::Graphics& g)
@@ -139,9 +139,6 @@ void  VIVI_SynthAudioProcessorEditor::Themes(int SelectedTheme)
 	}
 
 }
-
-
-
 
 void VIVI_SynthAudioProcessorEditor::resized()
 {
