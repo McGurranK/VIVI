@@ -11,100 +11,43 @@
 
 //==============================================================================
 VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p) , Tab(juce::TabbedButtonBar::Orientation::TabsAtTop)
+    : AudioProcessorEditor (&p), audioProcessor (p)  , Tab (juce::TabbedButtonBar::Orientation::TabsAtTop)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-	setSize(1000, 1000);
-	
-	Themes(1);						// Initalise Theme Function
-
-	addAndMakeVisible(Tab);
-
-	Tab.setAccessible(true);
-
-	Tab.addTab("Oscillator Page", juce::Colours::hotpink,new OscillatorPage(), true);
-
-	Tab.addTab("Effects Page", juce::Colours::blue, new Component(), true);
-
-	Tab.addTab("Settings Page", juce::Colours::orange, new Component(), true);
-
-
-	/*
-	// Going through Slider Vector
-	for (auto i = 0; i < Sliders.size(); i++)
-	{
-
-		addAndMakeVisible(Sliders[i]);		// Make all Sliders Visible
-		Sliders[i]->setValue(0.00);			// Set Default Value
-		Sliders[i]->setAccessible(true);	// Accessible Functions are on for all sliders
-		Sliders[i]->setLookAndFeel(&OtherLookAndFeel);	// Create look and feel 
-
-
-		if (i != 6)
-		{
-
-			// First Slider Position in row
-			if (i != 0) 
-			{
-				Sliders[i]->setBounds(Sliders[i - 1]->getX() + 150, TopMargin, SliderWidth, SliderHeight);
-			}
-			
-			else
-			{
-				Sliders[i]->setBounds(20, TopMargin, SliderWidth, SliderHeight);
-			}
-			// Relative Positions
-		   
-
-			Sliders[i]->setSize(200, 200);
-			// Oscilator Slider TextBox and Slider
-			Sliders[i]->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 200, 30);
-			Sliders[i]->setSliderStyle(juce::Slider::SliderStyle::Rotary);
-		}
-		/*
-		// Spread Slider
-		else 
-		{
-			int centreWidth = getWidth() / 2;
-			int centreHeight = getHeight() / 2;
-			int SpreadWidth{ (getWidth() / 4) * 3 }, SpreadHeight{ 100 };
-			Sliders[i]->setSliderStyle(juce::Slider::SliderStyle::LinearBar);
-			Sliders[i]->setBounds(20, centreHeight-50, SpreadWidth, SpreadHeight);
-			Sliders[i]->setTitle("Spread");
-			Sliders[i]->setRange(0.00,4.00);
-
-		}
-		 
-		Osc1.setTitle("Oscilator One");
-		Osc2.setTitle("Oscilator Two");
-		Osc3.setTitle("Oscilator Three"); 		
-		Osc4.setTitle("Oscilator Four");
-		Osc5.setTitle("Oscilator Five");
-		Osc6.setTitle("Oscilator Six");
-		
-
-	}
+    /*  
+		Make sure that before the constructor has finished, you've set the
+		editor's size to whatever you need it to be. 
 	*/
 
+	setSize(1500, 900);
+	addAndMakeVisible(Tab);
+	Tab.setAccessible(true);
 
-	 /*
-	 
+	// 	Oscillator and Effects Pages setup with GUI objects
+	//	Next Change is keyboard mapping and fixing tabbed interface for accessibility Stuff
+
+	Tab.addTab("Oscillator", juce::Colours::linen,new OscillatorPage(), false);
+	Tab.addTab("Effects", juce::Colours::purple, new EffectsPage(), false);
+
+	Tab.addTab("Settings Page", juce::Colours::limegreen, new juce::Component, false);
+
+	Themes(1);						// Initalise Theme Function
+
 	for (auto j = 0; j < Button.size(); j++)
 	{
 		addAndMakeVisible(Button[j]);
 		Button[j]->setClickingTogglesState(true);
 	}
-
+	/*
 	Button[0]->setBounds(getWidth()-224, TopMargin +SliderHeight+ 50, 200, 200);
 	Button[1]->setBounds(getWidth()-224, TopMargin+SliderHeight+350 , 200, 200);
 	*/
+
 }
 
 VIVI_SynthAudioProcessorEditor::~VIVI_SynthAudioProcessorEditor()
 {
-}
 
+}
 
 //==============================================================================
 void VIVI_SynthAudioProcessorEditor::paint(juce::Graphics& g)
@@ -142,5 +85,7 @@ void  VIVI_SynthAudioProcessorEditor::Themes(int SelectedTheme)
 
 void VIVI_SynthAudioProcessorEditor::resized()
 {
+	// Border for Tab Interface
 	Tab.setBounds(getLocalBounds().reduced(20));
+	
 }

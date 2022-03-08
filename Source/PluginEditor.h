@@ -11,6 +11,10 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
+#if (_MSC_VER >= 1915)
+#define no_init_all deprecated
+#endif
+
 //==============================================================================
 /**
 */
@@ -26,79 +30,134 @@ public:
 	void Themes(int SelectedTheme);
 
 private:
+	
+	// Tabbed Interface
 	juce::TabbedComponent Tab;
 
+	// Custom Look
 	juce::LookAndFeel_V4 OtherLookAndFeel;
 
-	// All Buttons
-	juce::TextButton Freeze{ "Unfrozen" }, Mute{ "Unmuted" };
-
-	struct OscillatorPage : public juce::Component
+	struct OscillatorPage : juce::Component
 	{
+		// Oscillator Sliders and Vector Storage
+
+		juce::Slider Osc1, Osc2, Osc3, Osc4, Osc5, Osc6;
+		std::vector<juce::Slider*> Sliders = { &Osc1,&Osc2,&Osc3,&Osc4,&Osc5,&Osc6 };
+
+		int SliderWidth{ 300 }, SliderHeight{ 300 }, LeftMargin{ 24 }, TopMargin{ 24 }
+		, SliderDistance{500};
+
 		OscillatorPage()
 		{
-			for (int i = 0; i < Sliders.size(); i++)
+			for (auto i = 0; i < Sliders.size(); i++)
 			{
-				addAndMakeVisible(Sliders[i]);
+				addAndMakeVisible(Sliders[i]);		// Make all Sliders Visible
+				Sliders[i]->setValue(0.00);			// Set Default Value
 				Sliders[i]->setAccessible(true);	// Accessible Functions are on for all sliders
-				Osc1.setTitle("Oscilator One");
-				Osc2.setTitle("Oscilator Two");
-				Osc3.setTitle("Oscilator Three");
-				Osc4.setTitle("Oscilator Four");
-				Osc5.setTitle("Oscilator Five");
-				Osc6.setTitle("Oscilator Six");
+
+				// Oscilator Slider TextBox and Slider
+				Sliders[i]->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 200, 30);
+				Sliders[i]->setSliderStyle(juce::Slider::SliderStyle::Rotary);
 
 
-				if (i != 6)
+				if (i == 0)
 				{
-					Sliders[i]->setRange(-70, 6, 1);
-					// First Slider Position in row
-					if (i != 0)
-					{
-						Sliders[i]->setBounds(Sliders[i - 1]->getX() + 150, TopMargin, SliderWidth, SliderHeight);
-					}
 
+					Sliders[i]->setBounds(20, TopMargin, SliderWidth, SliderHeight);
+
+				}
+				else if (i < 3)
+				{
+					Sliders[i]->setBounds(Sliders[i - 1]->getX() + SliderDistance, TopMargin, SliderWidth, SliderHeight);
+
+				}
+
+				else
+				{
+					if (i == 3)
+					{
+						Sliders[i]->setBounds(20, TopMargin+ 300, SliderWidth, SliderHeight);
+					}
 					else
 					{
-						Sliders[i]->setRange(0,4,0.01);
-						Sliders[i]->setBounds(20, TopMargin, SliderWidth, SliderHeight);
+						Sliders[i]->setBounds(Sliders[i - 1]->getX() + SliderDistance, TopMargin + 300, SliderWidth, SliderHeight);
 					}
-					// Relative Positions
 
-
-					Sliders[i]->setSize(200, 200);
-					// Oscilator Slider TextBox and Slider
-					Sliders[i]->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 200, 30);
-					Sliders[i]->setSliderStyle(juce::Slider::SliderStyle::Rotary);
 				}
 
 			}
+
 		}
 
-		juce::Slider Osc1,Osc2,Osc3,Osc4,Osc5,Osc6,Spread;
+	};
 
-		std::vector<juce::Slider*> Sliders ={ &Osc1,&Osc2,&Osc3,&Osc4,&Osc5,&Osc6,&Spread };
+	struct EffectsPage : juce::Component
+	{
+		// Oscillator Sliders and Vector Storage
 
-		int SliderWidth{ 200 }, SliderHeight{ 200 }, LeftMargin{ 24 }, TopMargin{ 24 };
+	// Effects Page
+		juce::Slider Redux, Bitcrush, DelayLFO, AM, FilterCut, FilterQ;	   // Declare Sliders
+		std::vector<juce::Slider*> Effects =							   // Create Slider Vector
+		{ &Redux,&Bitcrush,&DelayLFO, &AM, &FilterCut, &FilterQ };
+
+		int SliderWidth{ 300 }, SliderHeight{ 300 }, LeftMargin{ 24 }, TopMargin{ 24 }
+		, SliderDistance{ 500 };
+
+		EffectsPage()
+		{
+			for (auto i = 0; i < Effects.size(); i++)
+			{
+				addAndMakeVisible(Effects[i]);		// Make all Sliders Visible
+				Effects[i]->setValue(0.00);			// Set Default Value
+				Effects[i]->setAccessible(true);	// Accessible Functions are on for all sliders
+
+				// Oscilator Slider TextBox and Slider
+				Effects[i]->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 200, 30);
+				Effects[i]->setSliderStyle(juce::Slider::SliderStyle::Rotary);
+
+
+				if (i == 0)
+				{
+
+					Effects[i]->setBounds(20, TopMargin, SliderWidth, SliderHeight);
+
+				}
+				else if (i < 3)
+				{
+					Effects[i]->setBounds(Effects[i - 1]->getX() + SliderDistance, TopMargin, SliderWidth, SliderHeight);
+
+				}
+
+				else
+				{
+					if (i == 3)
+					{
+						Effects[i]->setBounds(20, TopMargin + 300, SliderWidth, SliderHeight);
+					}
+					else
+					{
+						Effects[i]->setBounds(Effects[i - 1]->getX() + SliderDistance, TopMargin + 300, SliderWidth, SliderHeight);
+					}
+
+				}
+
+			}
+
+		}
 
 	};
-	/*
-	 All Slider Objects
-	juce::Slider 
-		Osc1, 
-		Osc2
-		, Osc3, Osc4, Osc5, Osc6, Spread;
 
-	// Osc Slider Objects
-	std::vector<juce::Slider*> Sliders =
-	{	&Osc1,&Osc2,&Osc3,&Osc4,&Osc5,&Osc6,&Spread};
+	// Effects Page
+	juce::Slider Redux, Bitcrush, DelayLFO, AM, FilterCut, FilterQ;	   // Declare Sliders
+	std::vector<juce::Slider*> Effects =							   // Create Slider Vector
+	{ &Redux,&Bitcrush,&DelayLFO, &AM, &FilterCut, &FilterQ };
 
-	*/
 
-	// Interface Buttons
-	std::vector<juce::TextButton*> Button  =
-	{ &Mute, &Freeze };
+	// Buttons and Vectors
+	
+	juce::TextButton Freeze{ "Unfrozen" }, Mute{ "Unmuted" };
 
+	std::vector<juce::TextButton*> Button  ={ &Mute, &Freeze };
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
