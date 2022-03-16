@@ -3,11 +3,11 @@
 <JUCERPROJECT id="ojeWUz" name="VIVI_Synth" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
   <MAINGROUP id="cZUL5y" name="VIVI_Synth">
-    <FILE id="lz3Gj2" name="GUIPage.cpp" compile="1" resource="0" file="Source/GUIPage.cpp"/>
-    <FILE id="vVdid2" name="GUIPage.h" compile="0" resource="0" file="Source/GUIPage.h"/>
     <GROUP id="{7E30934E-EB99-F3AD-B41E-02ADF3943463}" name="Source">
+      <FILE id="CKiTue" name="Effects.h" compile="0" resource="0" file="Source/Effects.h"/>
       <FILE id="jGD2KI" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
+      <FILE id="KplrUu" name="Oscillator.h" compile="0" resource="0" file="Source/Oscillator.h"/>
       <FILE id="v79izd" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
       <FILE id="e1NBvm" name="PluginEditor.cpp" compile="1" resource="0"
