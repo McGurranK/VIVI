@@ -16,6 +16,7 @@
 #if (_MSC_VER >= 1915)
 #define no_init_all deprecated
 #endif
+struct Oscillatorpage;
 
 //==============================================================================
 /**
@@ -31,23 +32,33 @@ public:
     void resized() override;
 	void Themes(int SelectedTheme);
 
+
+	OscillatorPage* OscPointer = new OscillatorPage();
+	EffectsPage* EffectPointer = new EffectsPage();
+
 private:
-	
-	// Tabbed Interface
+
+	// Get Screen Size to set reletive size and position
+	juce::Rectangle<int> r = juce::Desktop::getInstance().getDisplays().getMainDisplay().userArea;
+	int x = r.getWidth();
+	int y = r.getHeight();
+
+
+
+	// Tabbed Setup and variables
 	juce::TabbedComponent Tab;
+
+	float TabIndent{(float) y / 100 }, TabDepth{ (float) y / 10 };
+
+	// Button One Position X & Y and Size W & H
+	float   ButtonTwoY{0}
+		,	ButtonOneD{(float)x/10};
+
 
 	// Custom Look
 	juce::LookAndFeel_V4 OtherLookAndFeel;
 
-
-	// Effects Page
-	juce::Slider Redux, Bitcrush, DelayLFO, AM, FilterCut, FilterQ;	   // Declare Sliders
-	std::vector<juce::Slider*> Effects =							   // Create Slider Vector
-	{ &Redux,&Bitcrush,&DelayLFO, &AM, &FilterCut, &FilterQ };
-
-
 	// Buttons and Vectors
-	
 	juce::TextButton Freeze{ "Unfrozen" }, Mute{ "Unmuted" };
 
 	std::vector<juce::TextButton*> Button  ={ &Mute, &Freeze };

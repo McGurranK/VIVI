@@ -12,6 +12,7 @@
 #include "Effects.h"
 
 //==============================================================================
+
 VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)  , Tab (juce::TabbedButtonBar::Orientation::TabsAtTop)
 {
@@ -19,35 +20,51 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 		Make sure that before the constructor has finished, you've set the
 		editor's size to whatever you need it to be. 
 	*/
-
+	
 	setSize(1500, 900);
-	addAndMakeVisible(Tab);
-	Tab.setAccessible(true);
+
+
+	 addAndMakeVisible(Tab);
+	
 
 	// 	Oscillator and Effects Pages setup with GUI objects
 	//	Next Change is keyboard mapping and fixing tabbed interface for accessibility Stuff
 
-	Tab.addTab("Oscillator", juce::Colours::linen,new OscillatorPage(), false);
-	Tab.addTab("Effects", juce::Colours::purple, new EffectsPage(), false);
+	Tab.addTab("Oscillator Page", juce::Colours::linen,OscPointer, false);
+	Tab.addTab("Effects Page", juce::Colours::purple,EffectPointer, false);
+	Tab.addTab("Settings Page", juce::Colours::purple,EffectPointer, false);
 
-	Tab.addTab("Settings Page", juce::Colours::limegreen, new juce::Component, false);
+	//Tab.addTab("Settings Page", juce::Colours::limegreen, new juce::Component, false);
 
-	Themes(1);						// Initalise Theme Function
 
+	for (int i = 0; i < Tab.getNumTabs(); i++)
+		Tab.setTabBackgroundColour(i, juce::Colours::black);
+	
 	for (auto j = 0; j < Button.size(); j++)
 	{
 		addAndMakeVisible(Button[j]);
 		Button[j]->setClickingTogglesState(true);
 	}
-	/*
-	Button[0]->setBounds(getWidth()-224, TopMargin +SliderHeight+ 50, 200, 200);
-	Button[1]->setBounds(getWidth()-224, TopMargin+SliderHeight+350 , 200, 200);
-	*/
+
+	float ButtonOneX{ getWidth() - TabIndent - ButtonOneD },
+		ButtonTwoY{TabIndent+TabDepth};
+	
+	Button[0]->setBounds(ButtonOneX, ButtonTwoY, ButtonOneD, ButtonOneD);
+
+	Button[1]->setBounds(getWidth()-224, 20+250+350 , 200, 200);
+	
+	// For loop through Background Colour
+	for (int i = 0; i < Tab.getNumTabs(); i++)
+		Tab.setTabBackgroundColour(i, juce::Colours::black);
 
 }
 
 VIVI_SynthAudioProcessorEditor::~VIVI_SynthAudioProcessorEditor()
-{
+{	
+
+	// Deallocation of Heap
+	delete OscPointer;
+	delete EffectPointer;
 
 }
 
@@ -55,9 +72,11 @@ VIVI_SynthAudioProcessorEditor::~VIVI_SynthAudioProcessorEditor()
 void VIVI_SynthAudioProcessorEditor::paint(juce::Graphics& g)
 {
 	// (Our component is opaque, so we must completely fill the background with a solid colour)
-	g.fillAll(juce::Colours::aqua);
+
+
 
 }
+
 void  VIVI_SynthAudioProcessorEditor::Themes(int SelectedTheme)
 {
 
@@ -76,6 +95,8 @@ void  VIVI_SynthAudioProcessorEditor::Themes(int SelectedTheme)
 
 		break;
 	case 3:
+
+
 		break;
 	case 4:
 		break;
@@ -87,7 +108,9 @@ void  VIVI_SynthAudioProcessorEditor::Themes(int SelectedTheme)
 
 void VIVI_SynthAudioProcessorEditor::resized()
 {
-	// Border for Tab Interface
-	Tab.setBounds(getLocalBounds().reduced(20));
 	
+	// Border for Tab Interface
+	Tab.setBounds(getLocalBounds().reduced(TabIndent));
+	Tab.setTabBarDepth(TabDepth);
+
 }
