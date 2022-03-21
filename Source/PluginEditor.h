@@ -21,7 +21,7 @@ struct Oscillatorpage;
 //==============================================================================
 /**
 */
-class VIVI_SynthAudioProcessorEditor  : public juce::AudioProcessorEditor 
+class VIVI_SynthAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
     VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioProcessor&);
@@ -33,10 +33,14 @@ public:
 	void Themes(int SelectedTheme);
 
 
+
 	OscillatorPage* OscPointer = new OscillatorPage();
 	EffectsPage* EffectPointer = new EffectsPage();
+	
+
 
 private:
+
 
 	// Get Screen Size to set reletive size and position
 	juce::Rectangle<int> r = juce::Desktop::getInstance().getDisplays().getMainDisplay().userArea;
@@ -47,8 +51,15 @@ private:
 
 	// Tabbed Setup and variables
 	juce::TabbedComponent Tab;
+	
+
 
 	float TabIndent{(float) y / 100 }, TabDepth{ (float) y / 10 };
+
+	// Creating Slide objects
+	juce::Slider Volume, Gate;
+	std::vector<juce::Slider*> MainControls = {&Volume, &Gate};
+	float mainControlHeight{ 520 }, mainControlWidth{ 100 }, mainControlY{TabDepth+TabIndent+50};
 
 	// Button One Position X & Y and Size W & H
 	float   ButtonTwoY{0}
@@ -59,9 +70,9 @@ private:
 	juce::LookAndFeel_V4 OtherLookAndFeel;
 
 	// Buttons and Vectors
-	juce::TextButton Freeze{ "Unfrozen" }, Mute{ "Unmuted" };
+	juce::TextButton  Mute{ "Unmuted" };
 
-	std::vector<juce::TextButton*> Button  ={ &Mute, &Freeze };
+	std::vector<juce::TextButton*> Button  ={ &Mute};
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.

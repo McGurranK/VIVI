@@ -8,6 +8,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+
 #include "Oscillator.h"
 #include "Effects.h"
 
@@ -16,15 +17,16 @@
 VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)  , Tab (juce::TabbedButtonBar::Orientation::TabsAtTop)
 {
-    /*  
-		Make sure that before the constructor has finished, you've set the
-		editor's size to whatever you need it to be. 
-	*/
-	
-	setSize(1500, 900);
+	// Size of editor page	
+	setSize(1000, 700);
+	int windowWidth{ getWidth() }, WindowTenth{windowWidth/10};
+
+	float ButtonOneX{ getWidth() - TabIndent - ButtonOneD },
+		ButtonTwoY{TabIndent - 1};
 
 
-	 addAndMakeVisible(Tab);
+
+	addAndMakeVisible(Tab);
 	
 
 	// 	Oscillator and Effects Pages setup with GUI objects
@@ -40,18 +42,24 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 	for (int i = 0; i < Tab.getNumTabs(); i++)
 		Tab.setTabBackgroundColour(i, juce::Colours::black);
 	
-	for (auto j = 0; j < Button.size(); j++)
+	for (auto j = 0; j < MainControls.size(); j++)
 	{
-		addAndMakeVisible(Button[j]);
-		Button[j]->setClickingTogglesState(true);
+
+		addAndMakeVisible(MainControls[j]);
+		MainControls[j]->setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
+		MainControls[j]->setWantsKeyboardFocus(true);
 	}
-
-	float ButtonOneX{ getWidth() - TabIndent - ButtonOneD },
-		ButtonTwoY{TabIndent+TabDepth};
 	
-	Button[0]->setBounds(ButtonOneX, ButtonTwoY, ButtonOneD, ButtonOneD);
 
-	Button[1]->setBounds(getWidth()-224, 20+250+350 , 200, 200);
+	
+
+	addAndMakeVisible(Mute);
+	Mute.setClickingTogglesState(true);
+	Mute.setBounds(ButtonOneX, ButtonTwoY, ButtonOneD, TabDepth);
+
+
+	MainControls[0]->setBounds((windowWidth)-((windowWidth/5)*1.25),mainControlY ,mainControlWidth, mainControlHeight);
+	MainControls[1]->setBounds(MainControls[0]->getX()+WindowTenth+20,mainControlY ,mainControlWidth, mainControlHeight);
 	
 	// For loop through Background Colour
 	for (int i = 0; i < Tab.getNumTabs(); i++)
@@ -114,3 +122,5 @@ void VIVI_SynthAudioProcessorEditor::resized()
 	Tab.setTabBarDepth(TabDepth);
 
 }
+
+

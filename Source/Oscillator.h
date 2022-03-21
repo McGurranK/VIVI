@@ -19,22 +19,23 @@ struct OscillatorPage : juce::Component
 public:
 
 	// Oscillator Sliders and Vector Storage
-	juce::Slider Osc1, Osc2, Osc3, Osc4, Osc5, Osc6;
-	std::vector<juce::Slider*> Sliders = { &Osc1,&Osc2,&Osc3,&Osc4,&Osc5,&Osc6 };
+	juce::Slider Osc1, Osc2, Osc3, Osc4, Osc5, Osc6, Spread;
+	std::vector<juce::Slider*> Sliders = { &Osc1,&Osc2,&Osc3,&Osc4,&Osc5,&Osc6, &Spread};
 
 	// Array with all slider names to step through
-	std::array < std::string, 6 > OscilllatorNames = 
+	std::array < std::string, 7 > OscilllatorNames = 
 	{ "Oscillator One",
 	  "Oscillator Two",
 	  "Oscilator Three",
 	  "Oscillator Four",
 	  "Oscillator Five",
-	  "Oscillator Six" };
+	  "Oscillator Six",
+	  "Spread"};
 
 
 	// Initalising Slider variables
-	int SliderWidth{ 250 }, SliderHeight{ 250 }, LeftMargin{ 20 }, TopMargin{ 20 }
-	, SliderDistance{ 300 };
+	int SliderWidth{ 200 }, SliderHeight{ 200 }, LeftMargin{ 20 }, TopMargin{ 20 }
+	, SliderDistance{ 250 };
 
 
 	// Constructor 
@@ -45,32 +46,41 @@ public:
 		for (auto i = 0; i < Sliders.capacity(); i++)
 		{	
 
-			addAndMakeVisible(Sliders[i]);		// Make all Sliders Visible
-			Sliders[i]->setValue(0.00);			// Set Default Value
+			addAndMakeVisible(Sliders[i]);				// Make all Sliders Visible
+			Sliders[i]->setValue(0.00);					// Set Default Value
+			Sliders[i]->setWantsKeyboardFocus(true);    // Set focus for accessibility
 			Sliders[i]->setTitle(OscilllatorNames[i]);	// Set all names of variables
-
-			// Oscilator Slider TextBox and Slider
-			Sliders[i]->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 200, 30);    // Text Box Setup
-			Sliders[i]->setSliderStyle(juce::Slider::SliderStyle::Rotary);              // Set Slider style
-			Sliders[i]->setWantsKeyboardFocus(true);   // Set focus for accessibility
 
 
 			// Slider Layout
+			if (i < 6) {
+			Sliders[i]->setRange(-70, 6, 1);
+			Sliders[i]->setSliderStyle(juce::Slider::SliderStyle::Rotary);              // Set Slider style
+			Sliders[i]->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 200, 30);    // Text Box Setup
 
-			// Slider One Position
-			if (i == 0)
-				Sliders[i]->setBounds(20, TopMargin, SliderWidth, SliderHeight);
+			// Positional Information
+				if (i == 0)
+					Sliders[i]->setBounds(20, TopMargin, SliderWidth, SliderHeight);
 
-			// Slider Two and three
-			else if (i < 3)
-				Sliders[i]->setBounds(Sliders[i - 1]->getX() + SliderDistance, TopMargin, SliderWidth, SliderHeight);
+				// Slider Two and three
+				else if (i < 3)
+					Sliders[i]->setBounds(Sliders[i - 1]->getX() + SliderDistance, TopMargin, SliderWidth, SliderHeight);
 
-			// Sliders 4-6 Position
-			else
-				if (i == 3)
-					Sliders[i]->setBounds(20, TopMargin + 250, SliderWidth, SliderHeight);
+				// Sliders 4-6 Position
 				else
-					Sliders[i]->setBounds(Sliders[i - 1]->getX() + SliderDistance, TopMargin + 250, SliderWidth, SliderHeight);
+					if (i == 3)
+						Sliders[i]->setBounds(20, TopMargin + 220, SliderWidth, SliderHeight);
+					else
+						Sliders[i]->setBounds(Sliders[i - 1]->getX() + SliderDistance, TopMargin + 220, SliderWidth, SliderHeight);
+
+			}
+			else 
+			{
+				Sliders[i]->setSliderStyle(juce::Slider::SliderStyle::LinearBar);
+				Sliders[i]->setBounds(20,Sliders[3]->getY()+SliderHeight+ 50,700, 75);
+				Sliders[i]->setRange(0, 4, 0.01);
+				Sliders[i]->setTextBoxStyle(juce::Slider::TextBoxRight, false, 100, 30);    // Text Box Setup
+			}
 
 		}
 

@@ -21,23 +21,52 @@ struct EffectsPage : juce::Component
 	std::vector<juce::Slider*> Effects =							   // Create Slider Vector
 	{ &Redux,&Bitcrush,&DelayLFO, &AM, &FilterCut, &FilterQ };
 
-	int SliderWidth{ 300 }, SliderHeight{ 300 }, LeftMargin{ 24 }, TopMargin{ 24 }
-	, SliderDistance{ 500 };
+	// Slider Titles
+		std::array < std::string, 6 > EffectsNames =
+	{ "Redux",
+	  "Bitcrush",
+	  "Delay LFO",
+	  "Amplitude Mod",
+	  "Filter Cuttoff",
+	  "Filter Q"};
+
+	
+	
+	// Freeze Button
+	juce::TextButton Freeze{ "Freeze" };
+
+
+	int SliderWidth{ 200 }, SliderHeight{ 200 }, LeftMargin{ 20 }, TopMargin{ 20 }
+	, SliderDistance{ 250 };
 
 
 	// Constructor
 	EffectsPage()
-	{
+	{	
+		addAndMakeVisible(Freeze);
+	    Freeze.setClickingTogglesState(true);
+		Freeze.setBounds(20,(Effects[5]->getY() + 490), 700, 75);
+		Effects[1]->setRange(0.0,16.0,0.1);
+		Effects[2]->setRange(0.0,200.0,0.1);
+		Effects[3]->setRange(0.0,200.0,0.1);
+		Effects[4]->setRange(0,20000,1);
+		Effects[5]->setRange(0,1,0.01);
+
+
 		for (auto i = 0; i < Effects.capacity(); i++)
 		{
 			addAndMakeVisible(Effects[i]);		// Make all Sliders Visible
 			Effects[i]->setValue(0.00);			// Set Default Value
 			Effects[i]->setAccessible(true);	// Accessible Functions are on for all sliders
 			Effects[i]->setWantsKeyboardFocus(true);
+			Effects[i]->setTitle(EffectsNames[i]);
 
 			// Oscilator Slider TextBox and Slider
 			Effects[i]->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 200, 30);
 			Effects[i]->setSliderStyle(juce::Slider::SliderStyle::Rotary);
+
+			// Freeze
+
 
 
 			// Slider One Position
@@ -51,9 +80,9 @@ struct EffectsPage : juce::Component
 			// Sliders 4-6 Position
 			else
 				if (i == 3)
-					Effects[i]->setBounds(20, TopMargin + 250, SliderWidth, SliderHeight);
+					Effects[i]->setBounds(20, TopMargin + 220, SliderWidth, SliderHeight);
 				else
-					Effects[i]->setBounds(Effects[i - 1]->getX() + SliderDistance, TopMargin + 250, SliderWidth, SliderHeight);
+					Effects[i]->setBounds(Effects[i - 1]->getX() + SliderDistance, TopMargin + 220, SliderWidth, SliderHeight);
 
 		}
 
