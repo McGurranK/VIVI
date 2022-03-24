@@ -11,9 +11,8 @@
 #pragma once
 #include <JuceHeader.h>
 
-class VIVI_SynthAudioProcessorEditor;
-
-struct OscillatorPage : juce::Component
+struct OscillatorPage : juce::Component,
+	juce::Slider::Listener
 {
 
 public:
@@ -41,16 +40,14 @@ public:
 	// Constructor 
 	OscillatorPage()
 	{	
-		
 		// Loop through vector of objects to seteverything up
 		for (auto i = 0; i < Sliders.capacity(); i++)
 		{	
-
 			addAndMakeVisible(Sliders[i]);				// Make all Sliders Visible
 			Sliders[i]->setValue(0.00);					// Set Default Value
 			Sliders[i]->setWantsKeyboardFocus(true);    // Set focus for accessibility
 			Sliders[i]->setTitle(OscilllatorNames[i]);	// Set all names of variables
-
+			Sliders[i]->addListener(this);
 
 			// Slider Layout
 			if (i < 6) {
@@ -84,9 +81,28 @@ public:
 
 		}
 
+
 	}
 
 	// Destructor
-	~OscillatorPage(){}
+	~OscillatorPage()
+	{
+	}
+
+	float OscillatorPage::SendValue(int num)
+	{	
+		switch (num)
+		{
+			case 1:
+				float SliderOneVal = Sliders[0]->getValue();
+				return SliderOneVal;
+			break;
+		}
+ 	}
+
+
+
+	void OscillatorPage::sliderValueChanged(juce::Slider* slider) override
+	{}
 
 };

@@ -204,7 +204,7 @@ void VIVI_SynthAudioProcessor::processBlock (juce::AudioSampleBuffer& buffer, ju
 	for (int i = 0; i < getNumOutputChannels(); i++) {
 		if (i < C74_GENPLUGIN::num_outputs()) {
 			for (int j = 0; j < buffer.getNumSamples(); j++) {
-				buffer.getWritePointer(i)[j] =(float) m_OutputBuffers[i][j];
+				buffer.getWritePointer(i)[j] =(float) (m_OutputBuffers[i][j]) * 2;
 			}
 		} else {
 			buffer.clear (i, 0, buffer.getNumSamples());
@@ -222,9 +222,9 @@ juce::AudioProcessorEditor* VIVI_SynthAudioProcessor::createEditor()
 {	
 	
 	return new VIVI_SynthAudioProcessorEditor(*this);
-	/*
-    return new juce::GenericAudioProcessorEditor(this);
-	*/
+	
+    //return new juce::GenericAudioProcessorEditor(this);
+	
 }
 
 //==============================================================================

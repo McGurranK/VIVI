@@ -21,7 +21,8 @@ struct Oscillatorpage;
 //==============================================================================
 /**
 */
-class VIVI_SynthAudioProcessorEditor  : public juce::AudioProcessorEditor
+class VIVI_SynthAudioProcessorEditor  : public juce::AudioProcessorEditor,
+	juce::Slider::Listener
 {
 public:
     VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioProcessor&);
@@ -32,11 +33,13 @@ public:
     void resized() override;
 	void Themes(int SelectedTheme);
 
+	void sliderValueChanged(juce::Slider* sliderThatWasMoved) override;
 
 
 	OscillatorPage* OscPointer = new OscillatorPage();
 	EffectsPage* EffectPointer = new EffectsPage();
-	
+
+	OscillatorPage* OscilatorP;
 
 
 private:
