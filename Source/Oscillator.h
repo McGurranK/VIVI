@@ -13,6 +13,7 @@
 
 struct OscillatorPage : juce::Component,
 	juce::Slider::Listener
+
 {
 
 public:
@@ -40,6 +41,7 @@ public:
 	// Constructor 
 	OscillatorPage()
 	{	
+		
 		// Loop through vector of objects to seteverything up
 		for (auto i = 0; i < Sliders.capacity(); i++)
 		{	
@@ -89,20 +91,8 @@ public:
 	{
 	}
 
-	float OscillatorPage::SendValue(int num)
-	{	
-		switch (num)
-		{
-			case 1:
-				float SliderOneVal = Sliders[0]->getValue();
-				return SliderOneVal;
-			break;
-		}
- 	}
+	void sliderValueChanged(juce::Slider* slider) override;
 
-
-
-	void OscillatorPage::sliderValueChanged(juce::Slider* slider) override
-	{}
+	VIVI_SynthAudioProcessor ProcessorLink;
 
 };

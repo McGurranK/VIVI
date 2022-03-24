@@ -19,10 +19,6 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 	// Size of editor page	
 	setSize(1000, 700);
 	
-	OscillatorPage* OscilatorP;
-	float value = OscilatorP->SendValue(0);
-	DBG(value);
-
 	int windowWidth{ getWidth() }, WindowTenth{windowWidth/10};
 
 	float ButtonOneX{ getWidth() - TabIndent - ButtonOneD },
@@ -134,9 +130,9 @@ void VIVI_SynthAudioProcessorEditor::sliderValueChanged(juce::Slider* sliderThat
 	{
 		float GateSlider = MainControls[1]->getValue();
 		processor.setParameter(6, GateSlider);
+		
 	}
 
-	// Oscillators 1-6
 
 }
 	/*
@@ -179,6 +175,59 @@ void VIVI_SynthAudioProcessorEditor::ButtonPressed(juce::TextButton* toggledMute
 
 }
 */
+
+// Hooking up oscillator Page (Not optimium but works) [Fix scaling in Gen~]
+void OscillatorPage::sliderValueChanged(juce::Slider* slider)
+{	
+	// Oscillator One
+	if (slider == Sliders[0])
+	{
+		float OscillatorOneValue = Sliders[0]->getValue();
+		ProcessorLink.setParameter(9, OscillatorOneValue);
+	}
+	// Selecting Oscillator Two
+	else if (slider == Sliders[1])
+	{
+		float OscillatorTwoValue = Sliders[1]->getValue();
+		ProcessorLink.setParameter(12, OscillatorTwoValue);
+
+	}
+	// Selecting Oscillator Two
+	else if (slider == Sliders[2])
+	{
+		float OscillatorThreeValue = Sliders[2]->getValue();
+		ProcessorLink.setParameter(11, OscillatorThreeValue);
+
+	}
+	// Slecting Oscillator Three
+	else if (slider == Sliders[3])
+	{
+		float OscillatorFourValue = Sliders[3]->getValue();
+		ProcessorLink.setParameter(8, OscillatorFourValue);
+
+	}
+	// Selecting Oscillator Four
+	else if (slider == Sliders[4])
+	{
+		float OscillatorFiveValue = Sliders[4]->getValue();
+		ProcessorLink.setParameter(7, OscillatorFiveValue);
+
+	}
+	// Selecting Oscillator Six
+	else if (slider == Sliders[5])
+	{
+		float OscillatorSixValue = Sliders[5]->getValue();
+		ProcessorLink.setParameter(10, OscillatorSixValue);
+
+	}
+	// Selecting Spreader
+	else if (slider == Sliders[6])
+	{
+		float SpreaderSliderValue = Sliders[6]->getValue();
+		ProcessorLink.setParameter(14, SpreaderSliderValue);
+	}
+
+}
 
 void VIVI_SynthAudioProcessorEditor::resized()
 {
