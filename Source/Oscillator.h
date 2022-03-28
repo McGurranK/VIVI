@@ -11,11 +11,9 @@
 #pragma once
 #include <JuceHeader.h>
 
-struct OscillatorPage : juce::Component,
-	juce::Slider::Listener
+struct OscillatorPage: juce::Component,juce::Slider::Listener
 
 {
-
 public:
 
 	// Oscillator Sliders and Vector Storage
@@ -39,9 +37,8 @@ public:
 
 
 	// Constructor 
-	OscillatorPage()
+	OscillatorPage() 
 	{	
-		
 		// Loop through vector of objects to seteverything up
 		for (auto i = 0; i < Sliders.capacity(); i++)
 		{	
@@ -73,6 +70,7 @@ public:
 						Sliders[i]->setBounds(Sliders[i - 1]->getX() + SliderDistance, TopMargin + 220, SliderWidth, SliderHeight);
 
 			}
+
 			else 
 			{
 				Sliders[i]->setSliderStyle(juce::Slider::SliderStyle::LinearBar);
@@ -91,8 +89,8 @@ public:
 	{
 	}
 
-	void sliderValueChanged(juce::Slider* slider) override;
+	void sliderValueChanged(juce::Slider* sliderThatMoved) override;
 
-	VIVI_SynthAudioProcessor ProcessorLink;
+private:
 
 };

@@ -12,7 +12,8 @@
 #include <JuceHeader.h>
 
 
-struct EffectsPage : juce::Component
+struct EffectsPage : juce::Component,
+	juce::Slider::Listener
 {
 	// Oscillator Sliders and Vector Storage
 
@@ -60,6 +61,7 @@ struct EffectsPage : juce::Component
 			Effects[i]->setAccessible(true);	// Accessible Functions are on for all sliders
 			Effects[i]->setWantsKeyboardFocus(true);
 			Effects[i]->setTitle(EffectsNames[i]);
+			Effects[i]->addListener(this);
 
 			// Oscilator Slider TextBox and Slider
 			Effects[i]->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 200, 30);
@@ -97,5 +99,9 @@ struct EffectsPage : juce::Component
 
 	}
 
+	void sliderValueChanged(juce::Slider* slider) override;
+
+	VIVI_SynthAudioProcessor ProcessorLinker;
+	
 };
 

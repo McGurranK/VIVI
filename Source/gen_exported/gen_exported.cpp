@@ -827,7 +827,7 @@ void *create(t_param sr, long vs) {
 	pi->inputmax = 1;
 	pi->hasminmax = true;
 	pi->outputmin = 0;
-	pi->outputmax = 1000;
+	pi->outputmax = 200;
 	pi->exp = 0;
 	pi->units = "";		// no units defined
 	// initialize parameter 1 ("m_Bitcrush_25")

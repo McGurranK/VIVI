@@ -62,8 +62,11 @@ float VIVI_SynthAudioProcessor::getParameter (int index)
 
 void VIVI_SynthAudioProcessor::setParameter (int index, float newValue)
 {
+	
 	t_param min = C74_GENPLUGIN::getparametermin(m_C74PluginState, index);
+
 	t_param range = fabs(C74_GENPLUGIN::getparametermax(m_C74PluginState, index) - min);
+
 	t_param value = newValue * range + min;
 	
 	C74_GENPLUGIN::setparameter(m_C74PluginState, index, value, NULL);
@@ -77,7 +80,7 @@ const juce::String VIVI_SynthAudioProcessor::getParameterName (int index)
 const juce::String VIVI_SynthAudioProcessor::getParameterText (int index)
 {
 	juce::String text = juce::String(getParameter(index));
-	text += juce::String(" ");
+	text += juce::String("");
 	text += juce::String(C74_GENPLUGIN::getparameterunits(m_C74PluginState, index));
 
 	return text;
@@ -204,7 +207,7 @@ void VIVI_SynthAudioProcessor::processBlock (juce::AudioSampleBuffer& buffer, ju
 	for (int i = 0; i < getNumOutputChannels(); i++) {
 		if (i < C74_GENPLUGIN::num_outputs()) {
 			for (int j = 0; j < buffer.getNumSamples(); j++) {
-				buffer.getWritePointer(i)[j] =(float) (m_OutputBuffers[i][j]) * 2;
+				buffer.getWritePointer(i)[j] =(float) (m_OutputBuffers[i][j]) * 2* MuteState;
 			}
 		} else {
 			buffer.clear (i, 0, buffer.getNumSamples());
@@ -234,14 +237,9 @@ void VIVI_SynthAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 	
-	char *state;
-	size_t statesize = C74_GENPLUGIN::getstatesize(m_C74PluginState);
-	state = (char *)malloc(sizeof(char) * statesize);
-	
-	C74_GENPLUGIN::getstate(m_C74PluginState, state);
-	destData.replaceWith(state, sizeof(char) * statesize);
+	destData.setSize(C74_GENPLUGIN::getstatesize(m_C74PluginState), false);
+	C74_GENPLUGIN::getstate(m_C74PluginState,(char*) destData.getData());
 
-	if (state) free(state);
 }
 
 void VIVI_SynthAudioProcessor::setStateInformation (const void* data, int sizeInBytes)

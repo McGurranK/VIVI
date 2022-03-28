@@ -21,8 +21,8 @@ struct Oscillatorpage;
 //==============================================================================
 /**
 */
-class VIVI_SynthAudioProcessorEditor  : public juce::AudioProcessorEditor,
-	juce::Slider::Listener
+class VIVI_SynthAudioProcessorEditor   : public juce::AudioProcessorEditor,
+	juce::Slider::Listener, juce::Button::Listener
 {
 public:
     VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioProcessor&);
@@ -32,14 +32,15 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 	void Themes(int SelectedTheme);
-
+	
+	// override slider functionality
+	void buttonClicked(juce::Button* toggledButton) override;
 	void sliderValueChanged(juce::Slider* sliderThatWasMoved) override;
+	
 
-
+	// New Instance
 	OscillatorPage* OscPointer = new OscillatorPage();
 	EffectsPage* EffectPointer = new EffectsPage();
-
-	OscillatorPage* OscilatorP;
 
 
 private:
@@ -50,13 +51,8 @@ private:
 	int x = r.getWidth();
 	int y = r.getHeight();
 
-
-
 	// Tabbed Setup and variables
 	juce::TabbedComponent Tab;
-	
-
-
 	float TabIndent{(float) y / 100 }, TabDepth{ (float) y / 10 };
 
 	// Creating Slide objects

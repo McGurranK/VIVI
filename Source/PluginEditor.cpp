@@ -50,13 +50,11 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 		MainControls[j]->setRange(0.00, 1.00, 0.01);
 		MainControls[j]->addListener(this);
 	}
-	
-
-	
 
 	addAndMakeVisible(Mute);
 	Mute.setClickingTogglesState(true);
 	Mute.setBounds(ButtonOneX, ButtonTwoY, ButtonOneD, TabDepth);
+	Mute.addListener(this);
 
 
 	MainControls[0]->setBounds((windowWidth)-((windowWidth/5)*1.25),mainControlY ,mainControlWidth, mainControlHeight);
@@ -121,112 +119,148 @@ void VIVI_SynthAudioProcessorEditor::sliderValueChanged(juce::Slider* sliderThat
 	// Gain Slider Hook
 	if (sliderThatMoved == MainControls[0])
 	{
-		float VolumeSlider = MainControls[0]->getValue();
-		processor.setParameter(15, VolumeSlider);
+		float VolumeSlider = sliderThatMoved->getValue();
+		audioProcessor.setParameter(15, VolumeSlider);
 	}
 
 	// Gate Slider Hook
 	else if (sliderThatMoved == MainControls[0])
 	{
-		float GateSlider = MainControls[1]->getValue();
-		processor.setParameter(6, GateSlider);
-		
+		float GateSlider = sliderThatMoved->getValue();
+		audioProcessor.setParameter(6, GateSlider);
+
 	}
-
-
 }
-	/*
-	else if (sliderThatMoved == &Oscillators->Osc2)
-	{
-		float OscTwoSlider = Oscillators->Osc2.getValue();
-		processor.setParameter(12,OscTwoSlider);
-	}
-	else if (sliderThatMoved == &Oscillators->Osc3)
-	{
-		float OscThreeSlider = Oscillators->Osc1.getValue();
-		processor.setParameter(11, OscThreeSlider);
 
-	}
-	else if (sliderThatMoved == &Oscillators->Osc4)
-	{
-		float OscFourSlider = Oscillators->Osc4.getValue();
-		processor.setParameter(8, OscFourSlider);
-	}
-	else if (sliderThatMoved == &Oscillators->Osc5)
-	{
-		float OscFiveSlider = Oscillators->Osc5.getValue();
-		processor.setParameter(7, OscFiveSlider);
-	}
-	else if (sliderThatMoved == &Oscillators->Osc6)
-	{
-		float OscSixSlider = Oscillators->Osc6.getValue();
-		processor.setParameter(10, OscSixSlider);
-	}
-	
-}
-/*
-Implement toggle for mute and freeze
-void VIVI_SynthAudioProcessorEditor::ButtonPressed(juce::TextButton* toggledMute)
+// Mute Button On and off
+void VIVI_SynthAudioProcessorEditor::buttonClicked(juce::Button* toggledButton)
 {
-	if (toggledMute == Mute.getToggleStateValue())
-	{
+	int ProcessorState = 1;
 
+	if (toggledButton == &Mute)
+	{
+		bool Togglestate = Mute.getToggleState();
+
+		// If True set mute parameter to 1. if false 0
+		if (Togglestate == true) 
+		{
+			ProcessorState = 1;
+			Mute.setDescription("ON");
+			
+		}
+		else 
+		{
+			ProcessorState = 0;
+			Mute.setDescription("OFF");
+			DBG(ProcessorState);
+		}
 	}
 
 }
-*/
-
 // Hooking up oscillator Page (Not optimium but works) [Fix scaling in Gen~]
-void OscillatorPage::sliderValueChanged(juce::Slider* slider)
+
+
+/*
+(juce::Slider* sliderThatMoved)
 {	
 	// Oscillator One
-	if (slider == Sliders[0])
+	if (sliderThatMoved == Sliders[0])
 	{
-		float OscillatorOneValue = Sliders[0]->getValue();
-		ProcessorLink.setParameter(9, OscillatorOneValue);
+		float OscillatorOneValue = sliderThatMoved->getValue();
+		auto OscillatorOneLin = juce::Decibels::decibelsToGain(OscillatorOneValue);
+		ProcessorLink.setParameter(9, OscillatorOneLin);
+
+		DBG(ProcessorLink.getParameter(9));
 	}
+	/*
 	// Selecting Oscillator Two
-	else if (slider == Sliders[1])
+	else if (sliderThatMoved == Sliders[1])
 	{
-		float OscillatorTwoValue = Sliders[1]->getValue();
-		ProcessorLink.setParameter(12, OscillatorTwoValue);
+		float OscillatorTwoValue = sliderThatMoved->getValue();
+		auto OscillatorTwoLin = juce::Decibels::decibelsToGain(OscillatorTwoValue);
+		ProcessorLink.setParameter(12, OscillatorTwoLin);
+		DBG(ProcessorLink.getParameter(12));
 
 	}
 	// Selecting Oscillator Two
-	else if (slider == Sliders[2])
+	else if (sliderThatMoved == Sliders[2])
 	{
-		float OscillatorThreeValue = Sliders[2]->getValue();
-		ProcessorLink.setParameter(11, OscillatorThreeValue);
-
+		float OscillatorThreeValue = sliderThatMoved->getValue();
+		auto OscillatorThreeLin = juce::Decibels::decibelsToGain(OscillatorThreeValue);
+		ProcessorLink.setParameter(11, OscillatorThreeLin);
+		DBG(ProcessorLink.getParameter(11));
 	}
 	// Slecting Oscillator Three
-	else if (slider == Sliders[3])
+	else if (sliderThatMoved == Sliders[3])
 	{
-		float OscillatorFourValue = Sliders[3]->getValue();
+		float OscillatorFourValue = sliderThatMoved->getValue();
 		ProcessorLink.setParameter(8, OscillatorFourValue);
 
 	}
 	// Selecting Oscillator Four
-	else if (slider == Sliders[4])
+	else if (sliderThatMoved == Sliders[4])
 	{
-		float OscillatorFiveValue = Sliders[4]->getValue();
+		float OscillatorFiveValue = sliderThatMoved->getValue();
 		ProcessorLink.setParameter(7, OscillatorFiveValue);
 
 	}
 	// Selecting Oscillator Six
-	else if (slider == Sliders[5])
+	else if (sliderThatMoved == Sliders[5])
 	{
-		float OscillatorSixValue = Sliders[5]->getValue();
+		float OscillatorSixValue = sliderThatMoved->getValue();
 		ProcessorLink.setParameter(10, OscillatorSixValue);
 
 	}
 	// Selecting Spreader
-	else if (slider == Sliders[6])
+	else if (sliderThatMoved == Sliders[6])
 	{
-		float SpreaderSliderValue = Sliders[6]->getValue();
+		float SpreaderSliderValue = sliderThatMoved->getValue();
 		ProcessorLink.setParameter(14, SpreaderSliderValue);
 	}
+	*/
 
+void EffectsPage::sliderValueChanged(juce::Slider* slider)
+{	
+	// Redux Slider link
+	if (slider == Effects[0])
+	{
+		float ReduxLevel = Effects[0]->getValue();
+		ProcessorLinker.setParameter(13,ReduxLevel);
+
+	}
+	// Bitcrush Volume link
+	else if (slider == Effects[1])
+	{
+		float BitCrushLevel = Effects[0]->getValue();
+		ProcessorLinker.setParameter(1,BitCrushLevel);
+	}
+	// Delay LFO 
+	else if (slider == Effects[2])
+	{
+		float DelayLFOLevel = Effects[2]->getValue();
+		ProcessorLinker.setParameter(2, DelayLFOLevel);
+		
+
+	}
+	// AM
+	else if (slider == Effects[3])
+	{
+		float AMLevel = Effects[3]->getValue();
+		ProcessorLinker.setParameter(0, AMLevel);
+		
+	}
+	// Filter Cuttoff
+	else if (slider == Effects[4])
+	{
+		float CuttoffFreuency = Effects[4]->getValue();
+		ProcessorLinker.setParameter(3, CuttoffFreuency);
+	}
+	// Filter Q
+	else if (slider == Effects[5])
+	{
+		float FilterQlevel = Effects[5]->getValue();
+		ProcessorLinker.setParameter(4, FilterQlevel);
+	}
 }
 
 void VIVI_SynthAudioProcessorEditor::resized()
