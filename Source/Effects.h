@@ -13,7 +13,7 @@
 
 
 struct EffectsPage : juce::Component,
-	juce::Slider::Listener
+	juce::Slider::Listener, juce::Button::Listener
 {
 	// Oscillator Sliders and Vector Storage
 
@@ -22,17 +22,10 @@ struct EffectsPage : juce::Component,
 	std::vector<juce::Slider*> Effects =							   // Create Slider Vector
 	{ &Redux,&Bitcrush,&DelayLFO, &AM, &FilterCut, &FilterQ };
 
-	// Slider Titles
-		std::array < std::string, 6 > EffectsNames =
-	{ "Redux",
-	  "Bitcrush",
-	  "Delay LFO",
-	  "Amplitude Mod",
-	  "Filter Cuttoff",
-	  "Filter Q"};
+	// Slider Names
+	std::array < std::string, 6 > EffectsNames =
+	{"Redux","Bitcrush","Delay LFO","Amplitude Mod","Filter Cuttoff","Filter Q"};
 
-	
-	
 	// Freeze Button
 	juce::TextButton Freeze{ "Freeze" };
 
@@ -42,7 +35,7 @@ struct EffectsPage : juce::Component,
 
 
 	// Constructor
-	EffectsPage()
+	EffectsPage(VIVI_SynthAudioProcessor& p) : processorRef (p)
 	{	
 		addAndMakeVisible(Freeze);
 	    Freeze.setClickingTogglesState(true);
@@ -62,6 +55,7 @@ struct EffectsPage : juce::Component,
 			Effects[i]->setWantsKeyboardFocus(true);
 			Effects[i]->setTitle(EffectsNames[i]);
 			Effects[i]->addListener(this);
+			Freeze.addListener(this);
 
 			// Oscilator Slider TextBox and Slider
 			Effects[i]->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 200, 30);
@@ -93,15 +87,19 @@ struct EffectsPage : juce::Component,
 	// Destructor
 	~EffectsPage()
 	{	
-		
+		// Clearing vector from memory
 		Effects.clear();
 		Effects.shrink_to_fit();
-
 	}
-
+	// Button Listener
+	void buttonClicked(juce::Button* Button) override;
+	
+	// Slider Listener
 	void sliderValueChanged(juce::Slider* slider) override;
 
-	VIVI_SynthAudioProcessor ProcessorLinker;
-	
-};
+	// Slider value normalisation and link to processor
+	void SliderScaler(juce::Slider* Slider,int GenReferenceNumber);
 
+	// Processor Reference to link Sliders to plugins
+	VIVI_SynthAudioProcessor& processorRef;
+};

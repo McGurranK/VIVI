@@ -16,7 +16,6 @@
 #if (_MSC_VER >= 1915)
 #define no_init_all deprecated
 #endif
-struct Oscillatorpage;
 
 //==============================================================================
 /**
@@ -36,11 +35,6 @@ public:
 	// override slider functionality
 	void buttonClicked(juce::Button* toggledButton) override;
 	void sliderValueChanged(juce::Slider* sliderThatWasMoved) override;
-	
-
-	// New Instance
-	OscillatorPage* OscPointer = new OscillatorPage();
-	EffectsPage* EffectPointer = new EffectsPage();
 
 
 private:
@@ -76,7 +70,6 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     VIVI_SynthAudioProcessor& audioProcessor;
-
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VIVI_SynthAudioProcessorEditor)
 };

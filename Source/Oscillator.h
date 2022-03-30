@@ -37,7 +37,7 @@ public:
 
 
 	// Constructor 
-	OscillatorPage() 
+	OscillatorPage(VIVI_SynthAudioProcessor &p): ProcessorRef(p)
 	{	
 		// Loop through vector of objects to seteverything up
 		for (auto i = 0; i < Sliders.capacity(); i++)
@@ -50,7 +50,7 @@ public:
 
 			// Slider Layout
 			if (i < 6) {
-			Sliders[i]->setRange(-70, 6, 1);
+			Sliders[i]->setRange(-100, 6, 1);
 			Sliders[i]->setSliderStyle(juce::Slider::SliderStyle::Rotary);              // Set Slider style
 			Sliders[i]->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 200, 30);    // Text Box Setup
 
@@ -71,26 +71,26 @@ public:
 
 			}
 
-			else 
+			else
 			{
 				Sliders[i]->setSliderStyle(juce::Slider::SliderStyle::LinearBar);
-				Sliders[i]->setBounds(20,Sliders[3]->getY()+SliderHeight+ 50,700, 75);
+				Sliders[i]->setBounds(20, Sliders[3]->getY() + SliderHeight + 50, 700, 75);
 				Sliders[i]->setRange(0, 4, 0.01);
 				Sliders[i]->setTextBoxStyle(juce::Slider::TextBoxRight, false, 100, 30);    // Text Box Setup
 			}
-
 		}
-
-
 	}
 
 	// Destructor
 	~OscillatorPage()
 	{
 	}
-
+	float converter(float oscValue, float minusInfinity);
 	void sliderValueChanged(juce::Slider* sliderThatMoved) override;
 
 private:
+
+	VIVI_SynthAudioProcessor& ProcessorRef;
+
 
 };

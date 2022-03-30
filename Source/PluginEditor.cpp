@@ -10,6 +10,8 @@
 #include "PluginEditor.h"
 #include "Oscillator.h"
 #include "Effects.h"
+#include <memory>
+using namespace std;
 
 //==============================================================================
 
@@ -31,11 +33,9 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 	// 	Oscillator and Effects Pages setup with GUI objects
 	//	Next Change is keyboard mapping and fixing tabbed interface for accessibility Stuff
 
-	Tab.addTab("Oscillator Page", juce::Colours::linen,OscPointer, false);
-	Tab.addTab("Effects Page", juce::Colours::purple,EffectPointer, false);
-	Tab.addTab("Settings Page", juce::Colours::purple,EffectPointer, false);
-
-	//Tab.addTab("Settings Page", juce::Colours::limegreen, new juce::Component, false);
+	Tab.addTab("Oscillator Page", juce::Colours::linen,new OscillatorPage(audioProcessor), true);
+	Tab.addTab("Effects Page", juce::Colours::purple,new EffectsPage(audioProcessor), true);
+	Tab.addTab("Settings Page", juce::Colours::purple, new EffectsPage(audioProcessor), true);
 
 
 	for (int i = 0; i < Tab.getNumTabs(); i++)
@@ -43,7 +43,6 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 	
 	for (auto j = 0; j < MainControls.size(); j++)
 	{
-
 		addAndMakeVisible(MainControls[j]);
 		MainControls[j]->setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
 		MainControls[j]->setWantsKeyboardFocus(true);
@@ -66,13 +65,9 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 
 }
 
+
 VIVI_SynthAudioProcessorEditor::~VIVI_SynthAudioProcessorEditor()
 {	
-
-	// Deallocation of Heap
-	delete OscPointer;
-	delete EffectPointer;
-
 }
 
 //==============================================================================
@@ -113,9 +108,17 @@ void  VIVI_SynthAudioProcessorEditor::Themes(int SelectedTheme)
 
 }
 
-void VIVI_SynthAudioProcessorEditor::sliderValueChanged(juce::Slider* sliderThatMoved)
+void VIVI_SynthAudioProcessorEditor::resized()
 {
 
+	// Border for Tab Interface
+	Tab.setBounds(getLocalBounds().reduced(TabIndent));
+	Tab.setTabBarDepth(TabDepth);
+
+}
+
+void VIVI_SynthAudioProcessorEditor::sliderValueChanged(juce::Slider* sliderThatMoved)
+{
 	// Gain Slider Hook
 	if (sliderThatMoved == MainControls[0])
 	{
@@ -157,29 +160,27 @@ void VIVI_SynthAudioProcessorEditor::buttonClicked(juce::Button* toggledButton)
 	}
 
 }
-// Hooking up oscillator Page (Not optimium but works) [Fix scaling in Gen~]
 
 
-/*
-(juce::Slider* sliderThatMoved)
-{	
-	// Oscillator One
+
+/// Oscillator Page
+
+// Hooking up oscillator Page (Not optimium but works)
+void OscillatorPage::sliderValueChanged(juce::Slider* sliderThatMoved)
+{
 	if (sliderThatMoved == Sliders[0])
 	{
 		float OscillatorOneValue = sliderThatMoved->getValue();
-		auto OscillatorOneLin = juce::Decibels::decibelsToGain(OscillatorOneValue);
-		ProcessorLink.setParameter(9, OscillatorOneLin);
+		float OscillatorOneValueLinear = juce::Decibels::decibelsToGain(OscillatorOneValue);
+		ProcessorRef.setParameter(9, OscillatorOneValueLinear);
 
-		DBG(ProcessorLink.getParameter(9));
 	}
-	/*
 	// Selecting Oscillator Two
 	else if (sliderThatMoved == Sliders[1])
 	{
 		float OscillatorTwoValue = sliderThatMoved->getValue();
-		auto OscillatorTwoLin = juce::Decibels::decibelsToGain(OscillatorTwoValue);
-		ProcessorLink.setParameter(12, OscillatorTwoLin);
-		DBG(ProcessorLink.getParameter(12));
+		float OscillatorTwoLin = juce::Decibels::decibelsToGain(OscillatorTwoValue);
+		ProcessorRef.setParameter(12, OscillatorTwoLin);
 
 	}
 	// Selecting Oscillator Two
@@ -187,89 +188,84 @@ void VIVI_SynthAudioProcessorEditor::buttonClicked(juce::Button* toggledButton)
 	{
 		float OscillatorThreeValue = sliderThatMoved->getValue();
 		auto OscillatorThreeLin = juce::Decibels::decibelsToGain(OscillatorThreeValue);
-		ProcessorLink.setParameter(11, OscillatorThreeLin);
-		DBG(ProcessorLink.getParameter(11));
+		ProcessorRef.setParameter(11, OscillatorThreeLin);
 	}
 	// Slecting Oscillator Three
 	else if (sliderThatMoved == Sliders[3])
 	{
 		float OscillatorFourValue = sliderThatMoved->getValue();
-		ProcessorLink.setParameter(8, OscillatorFourValue);
+		ProcessorRef.setParameter(8, OscillatorFourValue);
 
 	}
 	// Selecting Oscillator Four
 	else if (sliderThatMoved == Sliders[4])
 	{
 		float OscillatorFiveValue = sliderThatMoved->getValue();
-		ProcessorLink.setParameter(7, OscillatorFiveValue);
+		ProcessorRef.setParameter(7, OscillatorFiveValue);
 
 	}
 	// Selecting Oscillator Six
 	else if (sliderThatMoved == Sliders[5])
 	{
 		float OscillatorSixValue = sliderThatMoved->getValue();
-		ProcessorLink.setParameter(10, OscillatorSixValue);
+		ProcessorRef.setParameter(10, OscillatorSixValue);
 
 	}
 	// Selecting Spreader
 	else if (sliderThatMoved == Sliders[6])
 	{
 		float SpreaderSliderValue = sliderThatMoved->getValue();
-		ProcessorLink.setParameter(14, SpreaderSliderValue);
+		float NormalisedSpreader = SpreaderSliderValue / Sliders[6]->getMaximum();
+		ProcessorRef.setParameter(14, NormalisedSpreader);
 	}
-	*/
+}
 
+/////// Effects Page
+
+// Linking all Parameters to Gen Processor
 void EffectsPage::sliderValueChanged(juce::Slider* slider)
 {	
-	// Redux Slider link
-	if (slider == Effects[0])
-	{
-		float ReduxLevel = Effects[0]->getValue();
-		ProcessorLinker.setParameter(13,ReduxLevel);
 
-	}
-	// Bitcrush Volume link
-	else if (slider == Effects[1])
-	{
-		float BitCrushLevel = Effects[0]->getValue();
-		ProcessorLinker.setParameter(1,BitCrushLevel);
-	}
-	// Delay LFO 
-	else if (slider == Effects[2])
-	{
-		float DelayLFOLevel = Effects[2]->getValue();
-		ProcessorLinker.setParameter(2, DelayLFOLevel);
-		
-
-	}
-	// AM
-	else if (slider == Effects[3])
-	{
-		float AMLevel = Effects[3]->getValue();
-		ProcessorLinker.setParameter(0, AMLevel);
-		
-	}
-	// Filter Cuttoff
-	else if (slider == Effects[4])
-	{
-		float CuttoffFreuency = Effects[4]->getValue();
-		ProcessorLinker.setParameter(3, CuttoffFreuency);
-	}
-	// Filter Q
-	else if (slider == Effects[5])
-	{
-		float FilterQlevel = Effects[5]->getValue();
-		ProcessorLinker.setParameter(4, FilterQlevel);
-	}
-}
-
-void VIVI_SynthAudioProcessorEditor::resized()
-{
-	
-	// Border for Tab Interface
-	Tab.setBounds(getLocalBounds().reduced(TabIndent));
-	Tab.setTabBarDepth(TabDepth);
+	if (slider == Effects[0]) SliderScaler(slider, 13);	// setting Redux 
+	else if(slider == Effects[1]) SliderScaler(slider,1); // Setting Up Bitcrush
+	else if (slider == Effects[2]) SliderScaler(slider, 2); // Setting Up Delay LFO
+	else if (slider == Effects[3]) SliderScaler(slider, 0); // Setting Up AM
+	else if (slider == Effects[4]) SliderScaler(slider, 3); // Setting Up Filter Cut
+	else if (slider == Effects[5]) SliderScaler(slider, 4); // Setting Up Filter Q
 
 }
 
+// Scaling Effects Parameters to be normalised range for Gen Parameters and linking to processor
+void EffectsPage::SliderScaler(juce::Slider* slider, int GenReferenceNumber)
+{	
+	// Scaling Slider Value
+	float MaxValue = slider->getMaximum();
+	float CurrentValue = slider->getValue();
+	float Output = CurrentValue / MaxValue;
+
+	// Linking to Gen Audio Processor through ProcessorRef
+	processorRef.setParameter(GenReferenceNumber, Output);
+}
+
+// Linking Freeze Command to the ProcessorRef and setting up on/off functionality
+void EffectsPage::buttonClicked(juce::Button* Button)
+{	
+	float FreezeOutput{ 0 };
+	if (Button == &Freeze)
+	{	
+		bool Out = Button->getToggleState();
+		if (Out == true)
+		{
+			Freeze.setButtonText("Frozen");
+			FreezeOutput = 1;
+		}		
+		else 
+		{	
+			FreezeOutput = 0;
+			Freeze.setButtonText("Unfrozen");
+
+		}
+		processorRef.setParameter(5, FreezeOutput);
+	}
+}
 

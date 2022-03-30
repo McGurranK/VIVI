@@ -188,7 +188,7 @@ void VIVI_SynthAudioProcessor::processBlock (juce::AudioSampleBuffer& buffer, ju
 	for (int i = 0; i < C74_GENPLUGIN::num_inputs(); i++) {
 		if (i < getNumInputChannels()) {
 			for (int j = 0; j < m_CurrentBufferSize; j++) {
-				m_InputBuffers[i][j] = buffer.getReadPointer(i)[j];
+				m_InputBuffers[i][j] = (buffer.getReadPointer(i)[j])*2;
 			}
 		} else {
 			memset(m_InputBuffers[i], 0, m_CurrentBufferSize *  sizeof(double));
@@ -207,7 +207,7 @@ void VIVI_SynthAudioProcessor::processBlock (juce::AudioSampleBuffer& buffer, ju
 	for (int i = 0; i < getNumOutputChannels(); i++) {
 		if (i < C74_GENPLUGIN::num_outputs()) {
 			for (int j = 0; j < buffer.getNumSamples(); j++) {
-				buffer.getWritePointer(i)[j] =(float) (m_OutputBuffers[i][j]) * 2* MuteState;
+				buffer.getWritePointer(i)[j] =(float) (m_OutputBuffers[i][j]) * 2;
 			}
 		} else {
 			buffer.clear (i, 0, buffer.getNumSamples());
