@@ -10,10 +10,12 @@
 
 #pragma once
 #include <JuceHeader.h>
+#include "Themes.h"
 
 
 struct EffectsPage : juce::Component,
-	juce::Slider::Listener, juce::Button::Listener
+	juce::Slider::Listener, juce::Button::Listener,
+	Themes
 {
 	// Oscillator Sliders and Vector Storage
 
@@ -37,9 +39,12 @@ struct EffectsPage : juce::Component,
 	// Constructor
 	EffectsPage(VIVI_SynthAudioProcessor& p) : processorRef (p)
 	{	
+		Theme;
 		addAndMakeVisible(Freeze);
 	    Freeze.setClickingTogglesState(true);
 		Freeze.setBounds(20,(Effects[5]->getY() + 490), 700, 75);
+
+
 		Effects[1]->setRange(0.0,16.0,0.1);
 		Effects[2]->setRange(0.0,200.0,0.1);
 		Effects[3]->setRange(0.0,200.0,0.1);
@@ -49,6 +54,7 @@ struct EffectsPage : juce::Component,
 
 		for (auto i = 0; i < Effects.capacity(); i++)
 		{
+			Effects[i]->setLookAndFeel(&OtherLookAndFeel);
 			addAndMakeVisible(Effects[i]);		// Make all Sliders Visible
 			Effects[i]->setValue(0.00);			// Set Default Value
 			Effects[i]->setAccessible(true);	// Accessible Functions are on for all sliders
@@ -99,6 +105,8 @@ struct EffectsPage : juce::Component,
 
 	// Slider value normalisation and link to processor
 	void SliderScaler(juce::Slider* Slider,int GenReferenceNumber);
+	
+	Themes Theme;
 
 	// Processor Reference to link Sliders to plugins
 	VIVI_SynthAudioProcessor& processorRef;

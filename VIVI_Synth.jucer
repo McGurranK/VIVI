@@ -4,6 +4,8 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
   <MAINGROUP id="cZUL5y" name="VIVI_Synth">
     <GROUP id="{7E30934E-EB99-F3AD-B41E-02ADF3943463}" name="Source">
+      <FILE id="D1hFHa" name="Themes.h" compile="0" resource="0" file="Source/Themes.h"/>
+      <FILE id="aMUhKR" name="SettingsPage.h" compile="0" resource="0" file="Source/SettingsPage.h"/>
       <FILE id="CKiTue" name="Effects.h" compile="0" resource="0" file="Source/Effects.h"/>
       <FILE id="jGD2KI" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>

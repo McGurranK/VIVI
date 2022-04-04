@@ -10,6 +10,7 @@
 #include "PluginEditor.h"
 #include "Oscillator.h"
 #include "Effects.h"
+#include "SettingsPage.h"
 #include <memory>
 using namespace std;
 
@@ -35,7 +36,7 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 
 	Tab.addTab("Oscillator Page", juce::Colours::linen,new OscillatorPage(audioProcessor), true);
 	Tab.addTab("Effects Page", juce::Colours::purple,new EffectsPage(audioProcessor), true);
-	Tab.addTab("Settings Page", juce::Colours::purple, new EffectsPage(audioProcessor), true);
+	Tab.addTab("Settings Page", juce::Colours::purple, new SettingsPage, true);
 
 
 	for (int i = 0; i < Tab.getNumTabs(); i++)
@@ -73,39 +74,11 @@ VIVI_SynthAudioProcessorEditor::~VIVI_SynthAudioProcessorEditor()
 //==============================================================================
 void VIVI_SynthAudioProcessorEditor::paint(juce::Graphics& g)
 {
-	// (Our component is opaque, so we must completely fill the background with a solid colour)
-
 
 
 }
-
-void  VIVI_SynthAudioProcessorEditor::Themes(int SelectedTheme)
+void SettingsPage::buttonClicked(juce::Button* Button)
 {
-
-	switch (SelectedTheme)
-	{
-	case 1:
-
-		OtherLookAndFeel.setColour(juce::Slider::thumbColourId, juce::Colours::white);
-		OtherLookAndFeel.setColour(juce::Slider::backgroundColourId, juce::Colours::black);
-
-		break;
-	case 2:
-
-		OtherLookAndFeel.setColour(juce::Slider::thumbColourId, juce::Colours::purple);
-		OtherLookAndFeel.setColour(juce::Slider::backgroundColourId, juce::Colours::white);
-
-		break;
-	case 3:
-
-
-		break;
-	case 4:
-		break;
-	default:
-		break;
-	}
-
 }
 
 void VIVI_SynthAudioProcessorEditor::resized()

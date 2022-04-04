@@ -10,12 +10,12 @@
 
 #pragma once
 #include <JuceHeader.h>
+#include "Themes.h"
 
-struct OscillatorPage: juce::Component,juce::Slider::Listener
-
+struct OscillatorPage: juce::Component,juce::Slider::Listener,Themes
 {
 public:
-
+	
 	// Oscillator Sliders and Vector Storage
 	juce::Slider Osc1, Osc2, Osc3, Osc4, Osc5, Osc6, Spread;
 	std::vector<juce::Slider*> Sliders = { &Osc1,&Osc2,&Osc3,&Osc4,&Osc5,&Osc6, &Spread};
@@ -30,23 +30,30 @@ public:
 	  "Oscillator Six",
 	  "Spread"};
 
+	juce::Label Oscil{ "1" }, Oscil1{ "2" }, Oscil2{ "3" }, Oscil3{ "4" };
+
 
 	// Initalising Slider variables
 	int SliderWidth{ 200 }, SliderHeight{ 200 }, LeftMargin{ 20 }, TopMargin{ 20 }
 	, SliderDistance{ 250 };
 
+	Themes Theme;
 
 	// Constructor 
 	OscillatorPage(VIVI_SynthAudioProcessor &p): ProcessorRef(p)
 	{	
+		Theme;
 		// Loop through vector of objects to seteverything up
 		for (auto i = 0; i < Sliders.capacity(); i++)
 		{	
+			addAndMakeVisible(Oscil);
+			Oscil.setFont(juce::Font(16.0f, juce::Font::bold));
 			addAndMakeVisible(Sliders[i]);				// Make all Sliders Visible
 			Sliders[i]->setValue(0.00);					// Set Default Value
 			Sliders[i]->setWantsKeyboardFocus(true);    // Set focus for accessibility
 			Sliders[i]->setTitle(OscilllatorNames[i]);	// Set all names of variables
 			Sliders[i]->addListener(this);
+			Sliders[i]->setLookAndFeel(&OtherLookAndFeel);
 
 			// Slider Layout
 			if (i < 6) {
@@ -81,6 +88,8 @@ public:
 		}
 	}
 
+
+
 	// Destructor
 	~OscillatorPage()
 	{
@@ -88,9 +97,9 @@ public:
 	float converter(float oscValue, float minusInfinity);
 	void sliderValueChanged(juce::Slider* sliderThatMoved) override;
 
+	virtual bool keypressed(const& keypress & press);
+
+
 private:
-
 	VIVI_SynthAudioProcessor& ProcessorRef;
-
-
 };
