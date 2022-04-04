@@ -12,7 +12,8 @@
 #include <JuceHeader.h>
 #include "Themes.h"
 
-struct OscillatorPage: juce::Component,juce::Slider::Listener,Themes
+struct OscillatorPage: juce::Component,
+	juce::Slider::Listener,Themes
 {
 public:
 	
@@ -88,17 +89,15 @@ public:
 		}
 	}
 
-
-
 	// Destructor
 	~OscillatorPage()
 	{
 	}
+
 	float converter(float oscValue, float minusInfinity);
 	void sliderValueChanged(juce::Slider* sliderThatMoved) override;
-
-	virtual bool keypressed(const& keypress & press);
-
+	bool OscillatorPage::keyPressed(const juce::KeyPress & press) override;
+	juce::KeyPress key;
 
 private:
 	VIVI_SynthAudioProcessor& ProcessorRef;

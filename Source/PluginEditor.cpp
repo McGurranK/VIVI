@@ -193,6 +193,50 @@ void OscillatorPage::sliderValueChanged(juce::Slider* sliderThatMoved)
 	}
 }
 
+bool OscillatorPage::keyPressed(const juce::KeyPress & press)
+{	
+	if (press == ',')
+	{
+		DBG("Pressed");
+		Sliders[0]->grabKeyboardFocus();
+	}
+	else if (press == '.')
+	{
+		DBG("Two");
+		Sliders[1]->grabKeyboardFocus();
+
+	}
+	else if (press == '/')
+	{
+		DBG("Three");
+		Sliders[2]->grabKeyboardFocus();
+	}
+	if (press == ';')
+	{
+		DBG("Four");
+		Sliders[3]->grabKeyboardFocus();
+	}
+	else if (press == '[')
+	{
+		DBG("Five");
+		Sliders[4]->grabKeyboardFocus();
+
+	}
+	else if (press == '#')
+	{
+		DBG("Six");
+		Sliders[5]->grabKeyboardFocus();
+	}
+	else if (press == 's')
+	{
+		DBG("Spread");
+		Sliders[6]->grabKeyboardFocus();
+	}
+	return false;
+	//juce::KeyPress::backspaceKey
+}
+
+
 /////// Effects Page
 
 // Linking all Parameters to Gen Processor
@@ -242,3 +286,5 @@ void EffectsPage::buttonClicked(juce::Button* Button)
 	}
 }
 
+
+// 
