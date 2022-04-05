@@ -66,6 +66,10 @@ private:
 	juce::TextButton  Mute{ "Unmuted" };
 
 	std::vector<juce::TextButton*> Button  ={ &Mute};
+	
+	// Key Presses
+	bool keyPressed(const juce::KeyPress & press) override;
+	juce::KeyPress key;
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.

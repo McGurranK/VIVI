@@ -96,6 +96,7 @@ public:
 
 	float converter(float oscValue, float minusInfinity);
 	void sliderValueChanged(juce::Slider* sliderThatMoved) override;
+
 	bool OscillatorPage::keyPressed(const juce::KeyPress & press) override;
 	juce::KeyPress key;
 

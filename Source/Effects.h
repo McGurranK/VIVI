@@ -105,7 +105,12 @@ struct EffectsPage : juce::Component,
 
 	// Slider value normalisation and link to processor
 	void SliderScaler(juce::Slider* Slider,int GenReferenceNumber);
+
+	// Keyboard
 	
+	bool keyPressed(const juce::KeyPress & press) override;
+	juce::KeyPress key;
+
 	Themes Theme;
 
 	// Processor Reference to link Sliders to plugins

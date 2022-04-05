@@ -77,6 +77,27 @@ void VIVI_SynthAudioProcessorEditor::paint(juce::Graphics& g)
 
 
 }
+// Select Volume, Gate and Mute Parameters
+bool VIVI_SynthAudioProcessorEditor::keyPressed(const juce::KeyPress & press)
+{
+	if (press == 'V')
+	{
+		MainControls[0]->grabKeyboardFocus();
+		DBG("Volume");
+	}
+	else if (press == 'G')
+	{
+		MainControls[1]->grabKeyboardFocus();
+		DBG("Gate");
+	}
+	else if (press == 'M')
+	{
+		Mute.grabKeyboardFocus();
+		DBG("Mute");
+	}
+	return 0;
+}
+
 void SettingsPage::buttonClicked(juce::Button* Button)
 {
 }
@@ -227,17 +248,55 @@ bool OscillatorPage::keyPressed(const juce::KeyPress & press)
 		DBG("Six");
 		Sliders[5]->grabKeyboardFocus();
 	}
-	else if (press == 's')
+	else if (press == 'S')
 	{
 		DBG("Spread");
 		Sliders[6]->grabKeyboardFocus();
 	}
 	return false;
-	//juce::KeyPress::backspaceKey
 }
-
-
 /////// Effects Page
+
+bool EffectsPage::keyPressed(const juce::KeyPress & press)
+{
+	if (press == 'R')
+	{	
+		DBG("Redux");
+		Effects[0]->grabKeyboardFocus();
+	}
+	else if (press == 'B')
+	{
+		DBG("Bitcrush");
+		Effects[1]->grabKeyboardFocus();
+	}
+	if (press == 'D')
+	{
+		DBG("Delay LFO");
+		Effects[2]->grabKeyboardFocus();
+	}
+	else if (press == 'A')
+	{
+		DBG("Amplitude");
+		Effects[3]->grabKeyboardFocus();
+	}
+	else if (press == 'C')
+	{
+		DBG("Cuttoff");
+		Effects[4]->grabKeyboardFocus();
+	}
+	else if (press == 'Q')
+	{
+		DBG("Flter Q");
+		Effects[5]->grabKeyboardFocus();
+	}
+	else if (press == 'F')
+	{
+		DBG("Freeze");
+		Freeze.grabKeyboardFocus();
+		Freeze.triggerClick();
+	}
+	return false;
+}
 
 // Linking all Parameters to Gen Processor
 void EffectsPage::sliderValueChanged(juce::Slider* slider)
