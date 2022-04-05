@@ -49,6 +49,8 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 		MainControls[j]->setWantsKeyboardFocus(true);
 		MainControls[j]->setRange(0.00, 1.00, 0.01);
 		MainControls[j]->addListener(this);
+		MainControls[j]->setColour(juce::Slider::trackColourId,juce::Colours::purple);
+		MainControls[j]->setHasFocusOutline(true);
 	}
 
 	addAndMakeVisible(Mute);
@@ -74,7 +76,7 @@ VIVI_SynthAudioProcessorEditor::~VIVI_SynthAudioProcessorEditor()
 //==============================================================================
 void VIVI_SynthAudioProcessorEditor::paint(juce::Graphics& g)
 {
-
+	g.fillAll(juce::Colours::purple);
 
 }
 // Select Volume, Gate and Mute Parameters
@@ -94,6 +96,18 @@ bool VIVI_SynthAudioProcessorEditor::keyPressed(const juce::KeyPress & press)
 	{
 		Mute.grabKeyboardFocus();
 		DBG("Mute");
+	}
+	else if (press == 'O')
+	{
+		Tab.setCurrentTabIndex(0);
+	}
+	else if (press == 'E')
+	{
+		Tab.setCurrentTabIndex(1);
+	}
+	else if (press == 'L')
+	{
+		Tab.setCurrentTabIndex(2);
 	}
 	return 0;
 }
@@ -302,7 +316,7 @@ bool EffectsPage::keyPressed(const juce::KeyPress & press)
 void EffectsPage::sliderValueChanged(juce::Slider* slider)
 {	
 
-	if (slider == Effects[0]) SliderScaler(slider, 13);	// setting Redux 
+	if (slider == Effects[0])SliderScaler(slider, 13);	// setting Redux 
 	else if(slider == Effects[1]) SliderScaler(slider,1); // Setting Up Bitcrush
 	else if (slider == Effects[2]) SliderScaler(slider, 2); // Setting Up Delay LFO
 	else if (slider == Effects[3]) SliderScaler(slider, 0); // Setting Up AM

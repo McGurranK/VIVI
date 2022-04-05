@@ -47,15 +47,14 @@ public:
 		// Loop through vector of objects to seteverything up
 		for (auto i = 0; i < Sliders.capacity(); i++)
 		{	
-			addAndMakeVisible(Oscil);
-			Oscil.setFont(juce::Font(16.0f, juce::Font::bold));
+			
 			addAndMakeVisible(Sliders[i]);				// Make all Sliders Visible
 			Sliders[i]->setValue(0.00);					// Set Default Value
 			Sliders[i]->setWantsKeyboardFocus(true);    // Set focus for accessibility
 			Sliders[i]->setTitle(OscilllatorNames[i]);	// Set all names of variables
 			Sliders[i]->addListener(this);
 			Sliders[i]->setLookAndFeel(&OtherLookAndFeel);
-
+			Sliders[i]->setHasFocusOutline(true);
 			// Slider Layout
 			if (i < 6) {
 			Sliders[i]->setRange(-100, 6, 1);

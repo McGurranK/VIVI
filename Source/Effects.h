@@ -61,6 +61,7 @@ struct EffectsPage : juce::Component,
 			Effects[i]->setWantsKeyboardFocus(true);
 			Effects[i]->setTitle(EffectsNames[i]);
 			Effects[i]->addListener(this);
+			Effects[i]->setHasFocusOutline(true);
 			Freeze.addListener(this);
 
 			// Oscilator Slider TextBox and Slider

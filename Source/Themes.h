@@ -16,7 +16,7 @@ public:
 	Themes() 
 	{	
 		OtherLookAndFeel.setColour(juce::Slider::thumbColourId, juce::Colours::purple);
-		OtherLookAndFeel.setColour(juce::Slider::backgroundColourId, juce::Colours::black);
+		OtherLookAndFeel.setColour(juce::Slider::backgroundColourId, juce::Colours::blue);
 		OtherLookAndFeel.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::white);
 	}
 
