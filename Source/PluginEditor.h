@@ -38,7 +38,8 @@ public:
 
 
 private:
-
+	// Top Page Labels
+	juce::Label VolumeLabel, GateLabel;
 
 	// Get Screen Size to set reletive size and position
 	juce::Rectangle<int> r = juce::Desktop::getInstance().getDisplays().getMainDisplay().userArea;

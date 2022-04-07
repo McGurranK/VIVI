@@ -13,14 +13,18 @@
 struct Themes
 {
 public:
+
 	Themes() 
 	{	
 		OtherLookAndFeel.setColour(juce::Slider::thumbColourId, juce::Colours::purple);
-		OtherLookAndFeel.setColour(juce::Slider::backgroundColourId, juce::Colours::blue);
 		OtherLookAndFeel.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::white);
+		OtherLookAndFeel.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::green);
+		OtherLookAndFeel.setColour(juce::Slider::trackColourId, juce::Colours::purple);
+		OtherLookAndFeel.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::purple);
+		OtherLookAndFeel.setColour(juce::Slider::textBoxHighlightColourId, juce::Colours::green);
+
 	}
 
 	// Custom Look
 	juce::LookAndFeel_V4 OtherLookAndFeel;
-
 };

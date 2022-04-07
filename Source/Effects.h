@@ -36,6 +36,19 @@ struct EffectsPage : juce::Component,
 	, SliderDistance{ 250 };
 
 
+	// Parameter Labels
+	juce::Label ReduxLabel, BitcrushLabel,
+		DelayLFOLabel, AmplitudeLabel, CuttOffLabel,
+		QLabel;
+
+	std::vector<juce::Label*> EffectsLabels = { &ReduxLabel, &BitcrushLabel,
+		&DelayLFOLabel, &AmplitudeLabel, &CuttOffLabel,
+		&QLabel};
+
+	std::array<std::string, 6> EffectsLabelNames =
+	{ "Redux","Bit","Delay","AM","Filter","Q" };
+
+
 	// Constructor
 	EffectsPage(VIVI_SynthAudioProcessor& p) : processorRef (p)
 	{	
@@ -50,6 +63,8 @@ struct EffectsPage : juce::Component,
 		Effects[3]->setRange(0.0,200.0,0.1);
 		Effects[4]->setRange(0,20000,1);
 		Effects[5]->setRange(0,1,0.01);
+
+
 
 
 		for (auto i = 0; i < Effects.capacity(); i++)
@@ -70,7 +85,14 @@ struct EffectsPage : juce::Component,
 
 			// Freeze
 
-
+			// Labels
+			EffectsLabels[i]->setText(EffectsLabelNames[i], juce::NotificationType::dontSendNotification);
+			EffectsLabels[i]->setFont(juce::Font(28.0f, juce::Font::bold));
+			EffectsLabels[i]->setMinimumHorizontalScale(1);
+			EffectsLabels[i]->setColour(juce::Label::textColourId, juce::Colours::lightgreen);
+			EffectsLabels[i]->setJustificationType(juce::Justification::centred);
+			EffectsLabels[i]->attachToComponent(Effects[i], false);
+			EffectsLabels[i]->setBounds(65, 50, 100, 100);
 
 			// Slider One Position
 			if (i == 0)
@@ -98,6 +120,19 @@ struct EffectsPage : juce::Component,
 		Effects.clear();
 		Effects.shrink_to_fit();
 	}
+	// Labels
+	void resized()
+	{
+
+		for (int i = 0; i < Effects.size(); i++)
+		{
+			float SliderY = Effects[i]->getY();
+			float SliderX = Effects[i]->getX();
+			EffectsLabels[i]->setBounds(SliderX + 50, SliderY + 30, 100, 100);
+
+		}
+	}
+
 	// Button Listener
 	void buttonClicked(juce::Button* Button) override;
 	

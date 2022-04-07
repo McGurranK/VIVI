@@ -19,6 +19,8 @@ using namespace std;
 VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)  , Tab (juce::TabbedButtonBar::Orientation::TabsAtTop)
 {
+
+	
 	// Size of editor page	
 	setSize(1000, 700);
 	
@@ -29,6 +31,7 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 
 
 	addAndMakeVisible(Tab);
+	Tab.setAccessible(true);
 	
 
 	// 	Oscillator and Effects Pages setup with GUI objects
@@ -51,6 +54,7 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 		MainControls[j]->addListener(this);
 		MainControls[j]->setColour(juce::Slider::trackColourId,juce::Colours::purple);
 		MainControls[j]->setHasFocusOutline(true);
+		MainControls[j]->setTextBoxStyle(juce::Slider::TextBoxBelow,false,500,500);
 	}
 
 	addAndMakeVisible(Mute);
@@ -61,10 +65,6 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioP
 
 	MainControls[0]->setBounds((windowWidth)-((windowWidth/5)*1.25),mainControlY ,mainControlWidth, mainControlHeight);
 	MainControls[1]->setBounds(MainControls[0]->getX()+WindowTenth+20,mainControlY ,mainControlWidth, mainControlHeight);
-	
-	// For loop through Background Colour
-	for (int i = 0; i < Tab.getNumTabs(); i++)
-		Tab.setTabBackgroundColour(i, juce::Colours::black);
 
 }
 
@@ -131,6 +131,7 @@ void VIVI_SynthAudioProcessorEditor::sliderValueChanged(juce::Slider* sliderThat
 	if (sliderThatMoved == MainControls[0])
 	{
 		float VolumeSlider = sliderThatMoved->getValue();
+		sliderThatMoved->grabKeyboardFocus();
 		audioProcessor.setParameter(15, VolumeSlider);
 	}
 
@@ -138,6 +139,7 @@ void VIVI_SynthAudioProcessorEditor::sliderValueChanged(juce::Slider* sliderThat
 	else if (sliderThatMoved == MainControls[0])
 	{
 		float GateSlider = sliderThatMoved->getValue();
+		sliderThatMoved->grabKeyboardFocus();
 		audioProcessor.setParameter(6, GateSlider);
 
 	}
@@ -169,57 +171,19 @@ void VIVI_SynthAudioProcessorEditor::buttonClicked(juce::Button* toggledButton)
 
 }
 
-
-
 /// Oscillator Page
 
 // Hooking up oscillator Page (Not optimium but works)
 void OscillatorPage::sliderValueChanged(juce::Slider* sliderThatMoved)
 {
-	if (sliderThatMoved == Sliders[0])
-	{
-		float OscillatorOneValue = sliderThatMoved->getValue();
-		float OscillatorOneValueLinear = juce::Decibels::decibelsToGain(OscillatorOneValue);
-		ProcessorRef.setParameter(9, OscillatorOneValueLinear);
+	if (sliderThatMoved == Sliders[0]) converter(sliderThatMoved, 9); // Oscillator One
+	else if (sliderThatMoved == Sliders[1]) converter(sliderThatMoved, 12); // Oscillator Two
+	else if (sliderThatMoved == Sliders[2]) converter(sliderThatMoved, 11); // Oscillator Three
+	else if (sliderThatMoved == Sliders[3]) converter(sliderThatMoved, 8);	// Oscillator Four
+	else if (sliderThatMoved == Sliders[4]) converter(sliderThatMoved, 7); // Oscillator Five
+	else if (sliderThatMoved == Sliders[5]) converter(sliderThatMoved, 10); // Oscillator Six
 
-	}
-	// Selecting Oscillator Two
-	else if (sliderThatMoved == Sliders[1])
-	{
-		float OscillatorTwoValue = sliderThatMoved->getValue();
-		float OscillatorTwoLin = juce::Decibels::decibelsToGain(OscillatorTwoValue);
-		ProcessorRef.setParameter(12, OscillatorTwoLin);
-
-	}
-	// Selecting Oscillator Two
-	else if (sliderThatMoved == Sliders[2])
-	{
-		float OscillatorThreeValue = sliderThatMoved->getValue();
-		auto OscillatorThreeLin = juce::Decibels::decibelsToGain(OscillatorThreeValue);
-		ProcessorRef.setParameter(11, OscillatorThreeLin);
-	}
-	// Slecting Oscillator Three
-	else if (sliderThatMoved == Sliders[3])
-	{
-		float OscillatorFourValue = sliderThatMoved->getValue();
-		ProcessorRef.setParameter(8, OscillatorFourValue);
-
-	}
-	// Selecting Oscillator Four
-	else if (sliderThatMoved == Sliders[4])
-	{
-		float OscillatorFiveValue = sliderThatMoved->getValue();
-		ProcessorRef.setParameter(7, OscillatorFiveValue);
-
-	}
-	// Selecting Oscillator Six
-	else if (sliderThatMoved == Sliders[5])
-	{
-		float OscillatorSixValue = sliderThatMoved->getValue();
-		ProcessorRef.setParameter(10, OscillatorSixValue);
-
-	}
-	// Selecting Spreader
+	// Selecting spreader and normalising it
 	else if (sliderThatMoved == Sliders[6])
 	{
 		float SpreaderSliderValue = sliderThatMoved->getValue();
@@ -228,49 +192,42 @@ void OscillatorPage::sliderValueChanged(juce::Slider* sliderThatMoved)
 	}
 }
 
+// Changing Log to Linear values
+void OscillatorPage::converter(juce::Slider* slider, int GenReferenceNumber)
+{
+	// Scaling Slider Value
+	float CurrentValue = slider->getValue();
+	float Output = juce::Decibels::decibelsToGain(CurrentValue);
+
+	// Linking to Gen Audio Processor through ProcessorRef
+	ProcessorRef.setParameter(GenReferenceNumber, Output);
+	DBG(ProcessorRef.getParameter(GenReferenceNumber));
+	DBG(ProcessorRef.getParameterID(GenReferenceNumber));
+	slider->grabKeyboardFocus();
+}
+
 bool OscillatorPage::keyPressed(const juce::KeyPress & press)
 {	
-	if (press == ',')
-	{
-		DBG("Pressed");
-		Sliders[0]->grabKeyboardFocus();
-	}
-	else if (press == '.')
-	{
-		DBG("Two");
-		Sliders[1]->grabKeyboardFocus();
+// Shortcuts for all slider objects on oscillator page
 
-	}
-	else if (press == '/')
-	{
-		DBG("Three");
-		Sliders[2]->grabKeyboardFocus();
-	}
-	if (press == ';')
-	{
-		DBG("Four");
-		Sliders[3]->grabKeyboardFocus();
-	}
-	else if (press == '[')
-	{
-		DBG("Five");
-		Sliders[4]->grabKeyboardFocus();
+	if (press == ',') SliderFocus(0);       // Oscillator One Focus
+	else if (press == '.')SliderFocus(1);   // Oscillator Two Focus
+	else if (press == '/') SliderFocus(2);  // Oscillator Three Focus
+	if (press == ';') SliderFocus(3);       // Oscillator Four Focus
+	else if (press == '[') SliderFocus(4);  // Oscillator Five Focus
+	else if (press == '#') SliderFocus(5);  // Oscillator Six Focus
+	else if (press == 'S') SliderFocus(6);  // Spread Focus
 
-	}
-	else if (press == '#')
-	{
-		DBG("Six");
-		Sliders[5]->grabKeyboardFocus();
-	}
-	else if (press == 'S')
-	{
-		DBG("Spread");
-		Sliders[6]->grabKeyboardFocus();
-	}
 	return false;
 }
-/////// Effects Page
+// Focus Function
+void OscillatorPage::SliderFocus(int SliderFocus)
+{
+	Sliders[SliderFocus]->grabKeyboardFocus();
+	DBG(Sliders[SliderFocus]->getName());
+}
 
+/////// Effects Page
 bool EffectsPage::keyPressed(const juce::KeyPress & press)
 {
 	if (press == 'R')
@@ -332,6 +289,7 @@ void EffectsPage::SliderScaler(juce::Slider* slider, int GenReferenceNumber)
 	float MaxValue = slider->getMaximum();
 	float CurrentValue = slider->getValue();
 	float Output = CurrentValue / MaxValue;
+	slider->grabKeyboardFocus();
 
 	// Linking to Gen Audio Processor through ProcessorRef
 	processorRef.setParameter(GenReferenceNumber, Output);
@@ -348,6 +306,7 @@ void EffectsPage::buttonClicked(juce::Button* Button)
 		{
 			Freeze.setButtonText("Frozen");
 			FreezeOutput = 1;
+			
 		}		
 		else 
 		{	
