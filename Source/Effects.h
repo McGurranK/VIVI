@@ -17,38 +17,6 @@ struct EffectsPage : juce::Component,
 	juce::Slider::Listener, juce::Button::Listener,
 	Themes
 {
-	// Oscillator Sliders and Vector Storage
-
-// Effects Page
-	juce::Slider Redux, Bitcrush, DelayLFO, AM, FilterCut, FilterQ;	   // Declare Sliders
-	std::vector<juce::Slider*> Effects =							   // Create Slider Vector
-	{ &Redux,&Bitcrush,&DelayLFO, &AM, &FilterCut, &FilterQ };
-
-	// Slider Names
-	std::array < std::string, 6 > EffectsNames =
-	{"Redux","Bitcrush","Delay LFO","Amplitude Mod","Filter Cuttoff","Filter Q"};
-
-	// Freeze Button
-	juce::TextButton Freeze{ "Freeze" };
-
-
-	int SliderWidth{ 200 }, SliderHeight{ 200 }, LeftMargin{ 20 }, TopMargin{ 20 }
-	, SliderDistance{ 250 };
-
-
-	// Parameter Labels
-	juce::Label ReduxLabel, BitcrushLabel,
-		DelayLFOLabel, AmplitudeLabel, CuttOffLabel,
-		QLabel;
-
-	std::vector<juce::Label*> EffectsLabels = { &ReduxLabel, &BitcrushLabel,
-		&DelayLFOLabel, &AmplitudeLabel, &CuttOffLabel,
-		&QLabel};
-
-	std::array<std::string, 6> EffectsLabelNames =
-	{ "Redux","Bit","Delay","AM","Filter","Q" };
-
-
 	// Constructor
 	EffectsPage(VIVI_SynthAudioProcessor& p) : processorRef (p)
 	{	
@@ -58,12 +26,13 @@ struct EffectsPage : juce::Component,
 		Freeze.setBounds(20,(Effects[5]->getY() + 490), 700, 75);
 
 
+		Effects[0]->setRange(0.00,1.00,0.1);
 		Effects[1]->setRange(0.0,16.0,0.1);
 		Effects[2]->setRange(0.0,200.0,0.1);
 		Effects[3]->setRange(0.0,200.0,0.1);
 		Effects[4]->setRange(0,20000,1);
 		Effects[5]->setRange(0,1,0.01);
-
+		Freeze.setLookAndFeel(&OtherLookAndFeel);
 
 
 
@@ -74,16 +43,16 @@ struct EffectsPage : juce::Component,
 			Effects[i]->setValue(0.00);			// Set Default Value
 			Effects[i]->setAccessible(true);	// Accessible Functions are on for all sliders
 			Effects[i]->setWantsKeyboardFocus(true);
+
 			Effects[i]->setTitle(EffectsNames[i]);
 			Effects[i]->addListener(this);
 			Effects[i]->setHasFocusOutline(true);
 			Freeze.addListener(this);
 
+
 			// Oscilator Slider TextBox and Slider
 			Effects[i]->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 200, 30);
 			Effects[i]->setSliderStyle(juce::Slider::SliderStyle::Rotary);
-
-			// Freeze
 
 			// Labels
 			EffectsLabels[i]->setText(EffectsLabelNames[i], juce::NotificationType::dontSendNotification);
@@ -93,6 +62,7 @@ struct EffectsPage : juce::Component,
 			EffectsLabels[i]->setJustificationType(juce::Justification::centred);
 			EffectsLabels[i]->attachToComponent(Effects[i], false);
 			EffectsLabels[i]->setBounds(65, 50, 100, 100);
+			EffectsLabels[i]->setAccessible(false);
 
 			// Slider One Position
 			if (i == 0)
@@ -111,6 +81,28 @@ struct EffectsPage : juce::Component,
 
 		}
 
+		// Initalise all slider Linking to APVTS
+		mReduxAttachment = std::make_unique
+			<juce::AudioProcessorValueTreeState::SliderAttachment>
+			(processorRef.apvts, "ReDux", Redux);
+		mBitCurshAttachment = std::make_unique
+			<juce::AudioProcessorValueTreeState::SliderAttachment>
+			(processorRef.apvts, "Bitcrush", Bitcrush);
+		mDelayLFOAttachment = std::make_unique
+			<juce::AudioProcessorValueTreeState::SliderAttachment>
+			(processorRef.apvts, "DelayLFO",DelayLFO );
+		mAMAttachment = std::make_unique
+			<juce::AudioProcessorValueTreeState::SliderAttachment>
+			(processorRef.apvts, "AM", AM);
+		mFilterCutAttachment = std::make_unique
+			<juce::AudioProcessorValueTreeState::SliderAttachment>
+			(processorRef.apvts, "FilterCutOff", FilterCut);
+		mFilterQAttachment = std::make_unique
+			<juce::AudioProcessorValueTreeState::SliderAttachment>
+			(processorRef.apvts, "FilterQ", FilterQ);
+		mFreezeAttachment = std::make_unique
+			<juce::AudioProcessorValueTreeState::ButtonAttachment>
+			(processorRef.apvts, "Freeze", Freeze);
 	}
 	
 	// Destructor
@@ -148,6 +140,47 @@ struct EffectsPage : juce::Component,
 	juce::KeyPress key;
 
 	Themes Theme;
+
+private:
+
+	// APVTS Parameter Linking for Effects Page parameters
+	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>mReduxAttachment;
+	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>mBitCurshAttachment;
+	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>mDelayLFOAttachment;
+	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>mAMAttachment;
+	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>mFilterCutAttachment;
+	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>mFilterQAttachment;
+	std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>mFreezeAttachment;
+
+	// Effects Page
+	juce::Slider Redux, Bitcrush, DelayLFO, AM, FilterCut, FilterQ;	   // Declare Sliders
+	std::vector<juce::Slider*> Effects =							   // Create Slider Vector
+	{ &Redux,&Bitcrush,&DelayLFO, &AM, &FilterCut, &FilterQ };
+
+	// Slider Names
+	std::array < std::string, 6 > EffectsNames =
+	{ "Redux","Bitcrush","Delay LFO","Amplitude Mod","Filter Cuttoff","Filter Q" };
+
+	// Freeze Button
+	juce::TextButton Freeze{ "Freeze" };
+
+
+	int SliderWidth{ 200 }, SliderHeight{ 200 }, LeftMargin{ 20 }, TopMargin{ 20 }
+	, SliderDistance{ 250 };
+
+
+	// Parameter Labels
+	juce::Label ReduxLabel, BitcrushLabel,
+		DelayLFOLabel, AmplitudeLabel, CuttOffLabel,
+		QLabel;
+
+	std::vector<juce::Label*> EffectsLabels = { &ReduxLabel, &BitcrushLabel,
+		&DelayLFOLabel, &AmplitudeLabel, &CuttOffLabel,
+		&QLabel };
+
+	std::array<std::string, 6> EffectsLabelNames =
+	{ "Redux","Bit","Delay","AM","Filter","Q" };
+
 
 	// Processor Reference to link Sliders to plugins
 	VIVI_SynthAudioProcessor& processorRef;

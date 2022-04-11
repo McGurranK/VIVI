@@ -1,4 +1,4 @@
-/*
+ /*
   ==============================================================================
 
 	Effects.h
@@ -12,47 +12,23 @@
 #include <JuceHeader.h>
 #include "Themes.h"
 
-struct OscillatorPage: juce::Component,
+typedef struct OscillatorPage: juce::Component,
 	juce::Slider::Listener,Themes
 {
 public:
-	
-	// Oscillator Sliders and Vector Storage
-	juce::Slider Osc1, Osc2, Osc3, Osc4, Osc5, Osc6, Spread;
-	std::vector<juce::Slider*> Sliders = { &Osc1,&Osc2,&Osc3,&Osc4,&Osc5,&Osc6, &Spread};
-
-	// Array with all slider names to step through
-	std::array < std::string, 7 > OscilllatorNames = 
-	{ 
-	  "Oscillator One","Oscillator Two","Oscilator Three","Oscillator Four",
-	  "Oscillator Five","Oscillator Six","Spread"
-	};
-
-	// Initalising Slider variables
-	int SliderWidth{ 200 }, SliderHeight{ 200 }, LeftMargin{ 20 }, TopMargin{ 20 }
-	, SliderDistance{ 250 };
-
-	// Slider Labels and labe text
-	juce::Label OscillatorOneLabel, OscillatorTwoLabel,
-		OscillatorThreeLabel, OscillatorFourLabel, OscillatorFiveLabel,
-		OscillatorSixLabel, SpreadLabel;
-
-	std::vector<juce::Label*> OscLabels = {&OscillatorOneLabel, &OscillatorTwoLabel,
-		&OscillatorThreeLabel, &OscillatorFourLabel, &OscillatorFiveLabel,
-		&OscillatorSixLabel, &SpreadLabel };
-
-	std::array<std::string, 7> OscillatorLabelNames =
-	{"1","2","3","4","5","6","Spread" };
-
 	Themes Theme;
 
-	// Constructor 
+	int GrabFocus{ 0 };
+
+	// Oscillator Sliders and Vector Storage
+	juce::Slider Osc1, Osc2, Osc3, Osc4, Osc5, Osc6, Spread;
+	std::vector<juce::Slider*> Sliders = { &Osc1,&Osc2,&Osc3,&Osc4,&Osc5,&Osc6, &Spread };
+
+	// Constructor method
 	OscillatorPage(VIVI_SynthAudioProcessor &p): ProcessorRef(p)
 	{	
-
-		//OscillatorOneLabel.broughtToFront();
-
 		Theme;
+
 		// Loop through vector of objects to seteverything up
 		for (auto i = 0; i < Sliders.capacity(); i++)
 		{	
@@ -64,9 +40,11 @@ public:
 			Sliders[i]->setWantsKeyboardFocus(true); 
 			Sliders[i]->setHasFocusOutline(true);
 
-			// Accessibility and values
+			// Accessibility
 			Sliders[i]->getAccessibilityHandler();
-			Sliders[i]->setValue(0.00);					// Set Default Value
+
+
+			// Set Default Value
 			Sliders[i]->addListener(this);
 
 			// Look and text
@@ -81,6 +59,7 @@ public:
 			OscLabels[i]->setJustificationType(juce::Justification::centred);
 			OscLabels[i]->attachToComponent(Sliders[i], false);
 			OscLabels[i]->setBounds(65, 50, 100, 100);
+			OscLabels[i]->setAccessible(false);
 
 			// Slider Layout
 			if (i < 6) {
@@ -114,18 +93,37 @@ public:
 				Sliders[i]->setTextBoxStyle(juce::Slider::TextBoxRight, false, 100, 30);    // Text Box Setup
 			}
 		}
-	}
 
-	
+		// Initalise all slider Linking to APVTS
+		mOscAttachment = std::make_unique
+			<juce::AudioProcessorValueTreeState::SliderAttachment>
+			(ProcessorRef.apvts,"OscOneVol",Osc1);
+		mOscTwoAttachment = std::make_unique
+			<juce::AudioProcessorValueTreeState::SliderAttachment>
+			(ProcessorRef.apvts, "OscTwoVol", Osc2);
+		mOscThreeAttachment = std::make_unique
+			<juce::AudioProcessorValueTreeState::SliderAttachment>
+			(ProcessorRef.apvts, "OscThreeVol", Osc3);
+		mOscFourAttachment = std::make_unique
+			<juce::AudioProcessorValueTreeState::SliderAttachment>
+			(ProcessorRef.apvts, "OscFourVol", Osc4);
+		mOscFiveAttachment = std::make_unique
+			<juce::AudioProcessorValueTreeState::SliderAttachment>
+			(ProcessorRef.apvts, "OscFiveVol", Osc5);
+		mOscSixAttachment = std::make_unique
+			<juce::AudioProcessorValueTreeState::SliderAttachment>
+			(ProcessorRef.apvts, "OscSixVol", Osc6);
+		SpreadAttachment = std::make_unique
+			<juce::AudioProcessorValueTreeState::SliderAttachment>
+			(ProcessorRef.apvts, "Spread", Spread);
+	}
 
 	// Destructor
-	~OscillatorPage()
-	{
-	}
+	~OscillatorPage(){}
 
+	// Positioning Labels for componenets
 	void resized()
 	{
-		
 		for (int i = 0; i < Sliders.size(); i++)
 		{	
 			float SliderY = Sliders[i]->getY();
@@ -141,19 +139,58 @@ public:
 				OscLabels[i]->setBounds(SliderX , SliderY , 100, 100);
 			}
 		}
-	
 	}
 
-	// Slider Linking and rounding values
+	// Grab foucus and debugging with slider listener
 	void sliderValueChanged(juce::Slider* sliderThatMoved) override;
-	void converter(juce::Slider* slider, int GenReferenceNumber);
 	void SliderFocus(int SliderFocus);
+	void ValueChangedFocus(int GenRef, juce::Slider* SliderRef);
 	
+
 	// Keyboard implementation
 	bool OscillatorPage::keyPressed(const juce::KeyPress & press) override;
 	juce::KeyPress key;
 
 
 private:
+
+	// Initalising Slider variables
+	int SliderWidth{ 200 }, SliderHeight{ 200 }, LeftMargin{ 20 }, TopMargin{ 20 }
+	, SliderDistance{ 250 };
+
+	// APVTS Parameter Linking for Oscillator Page parameters
+	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>mOscAttachment;
+	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>mOscTwoAttachment;
+	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>mOscThreeAttachment;
+	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>mOscFourAttachment;
+	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>mOscFiveAttachment;
+	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>mOscSixAttachment;
+	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>SpreadAttachment;
+
+
+	// Array with all slider names to step through
+	std::array < std::string, 7 > OscilllatorNames =
+	{
+	  "Oscillator One","Oscillator Two","Oscilator Three","Oscillator Four",
+	  "Oscillator Five","Oscillator Six","Spread"
+	};
+
+	// Slider Labels and labe text
+	juce::Label OscillatorOneLabel, OscillatorTwoLabel,
+		OscillatorThreeLabel, OscillatorFourLabel, OscillatorFiveLabel,
+		OscillatorSixLabel, SpreadLabel;
+
+	std::vector<juce::Label*> OscLabels = { &OscillatorOneLabel, &OscillatorTwoLabel,
+		&OscillatorThreeLabel, &OscillatorFourLabel, &OscillatorFiveLabel,
+		&OscillatorSixLabel, &SpreadLabel };
+
+	std::array<std::string, 7> OscillatorLabelNames =
+	{ "1","2","3","4","5","6","Spread" };
+
+	std::array<int, 7> GenReferenceNumbers = { 9, 12, 11, 8, 7, 10, 14 };
+
+
+
 	VIVI_SynthAudioProcessor& ProcessorRef;
-};
+	
+} OscRef;

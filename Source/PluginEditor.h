@@ -20,8 +20,9 @@
 //==============================================================================
 /**
 */
+class OscillatorPage;
 class VIVI_SynthAudioProcessorEditor   : public juce::AudioProcessorEditor,
-	juce::Slider::Listener, juce::Button::Listener
+	juce::Slider::Listener, juce::Button::Listener 
 {
 public:
     VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioProcessor&);
@@ -30,7 +31,6 @@ public:
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
-	void Themes(int SelectedTheme);
 	
 	// override slider functionality
 	void buttonClicked(juce::Button* toggledButton) override;
@@ -75,7 +75,7 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     VIVI_SynthAudioProcessor& audioProcessor;
-
+	OscRef* OscReference;
+	
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VIVI_SynthAudioProcessorEditor)
 };
-

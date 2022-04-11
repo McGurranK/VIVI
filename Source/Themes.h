@@ -21,7 +21,9 @@ public:
 		OtherLookAndFeel.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::green);
 		OtherLookAndFeel.setColour(juce::Slider::trackColourId, juce::Colours::purple);
 		OtherLookAndFeel.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::purple);
-		OtherLookAndFeel.setColour(juce::Slider::textBoxHighlightColourId, juce::Colours::green);
+		OtherLookAndFeel.setColour(juce::TextButton::buttonOnColourId, juce::Colours::red);
+		OtherLookAndFeel.setColour(juce::TextButton::buttonColourId, juce::Colours::green);
+
 
 	}
 

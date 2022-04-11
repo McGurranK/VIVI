@@ -15,7 +15,7 @@
 //==============================================================================
 /**
 */
-class VIVI_SynthAudioProcessor : public juce::AudioProcessor
+class VIVI_SynthAudioProcessor : public juce::AudioProcessor, public juce::AudioProcessorValueTreeState::Listener
 {
 public:
     //==============================================================================
@@ -58,10 +58,16 @@ public:
     void setCurrentProgram (int index) override;
     const juce::String getProgramName (int index) override;
     void changeProgramName (int index, const juce::String& newName) override;
+	void parameterChanged(const juce::String& parameterID, float newValue) override;
 
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+
+	using APVTS = juce::AudioProcessorValueTreeState;
+	APVTS::ParameterLayout createParameterLayout();
+	APVTS apvts{ *this, nullptr, "Parameters", createParameterLayout() };
+
 
 protected:
 	// c74: since Juce does float sample processing and Gen offers double sample
@@ -71,9 +77,6 @@ protected:
 private:
     //==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VIVI_SynthAudioProcessor)
-
-	int MuteState;
-
 
 	CommonState				*m_C74PluginState;
 	

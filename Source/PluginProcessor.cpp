@@ -12,9 +12,10 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-VIVI_SynthAudioProcessor::VIVI_SynthAudioProcessor()
-:m_CurrentBufferSize(0)
+VIVI_SynthAudioProcessor::VIVI_SynthAudioProcessor() :m_CurrentBufferSize(0) 
+
 {
+
 	// use a default samplerate and vector size here, reset it later
 	m_C74PluginState = (CommonState *)C74_GENPLUGIN::create(44100, 64);
 	C74_GENPLUGIN::reset(m_C74PluginState);
@@ -27,6 +28,11 @@ VIVI_SynthAudioProcessor::VIVI_SynthAudioProcessor()
 	}
 	for (int i = 0; i < C74_GENPLUGIN::num_outputs(); i++) {
 		m_OutputBuffers[i] = NULL;
+	}
+	for (int i = 0; i < C74_GENPLUGIN::num_params(); ++i)
+	{
+		auto name = juce::String(C74_GENPLUGIN::getparametername(m_C74PluginState, i));
+		apvts.addParameterListener(name, this);
 	}
 
 }
@@ -172,6 +178,7 @@ void VIVI_SynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 	m_C74PluginState->vs = samplesPerBlock;
 
 	assureBufferSize(samplesPerBlock);
+
 }
 
 void VIVI_SynthAudioProcessor::releaseResources()
@@ -183,6 +190,7 @@ void VIVI_SynthAudioProcessor::releaseResources()
 void VIVI_SynthAudioProcessor::processBlock (juce::AudioSampleBuffer& buffer, juce::MidiBuffer& midiMessages)
 {
 	assureBufferSize(buffer.getNumSamples());
+
 	
 	// fill input buffers
 	for (int i = 0; i < C74_GENPLUGIN::num_inputs(); i++) {
@@ -207,7 +215,7 @@ void VIVI_SynthAudioProcessor::processBlock (juce::AudioSampleBuffer& buffer, ju
 	for (int i = 0; i < getNumOutputChannels(); i++) {
 		if (i < C74_GENPLUGIN::num_outputs()) {
 			for (int j = 0; j < buffer.getNumSamples(); j++) {
-				buffer.getWritePointer(i)[j] =(float) (m_OutputBuffers[i][j]) * 2;
+				buffer.getWritePointer(i)[j] =(float) (m_OutputBuffers[i][j]);
 			}
 		} else {
 			buffer.clear (i, 0, buffer.getNumSamples());
@@ -258,6 +266,37 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 //==============================================================================
 // C74 added methods
+void VIVI_SynthAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue)
+{
+	auto index = apvts.getParameter(parameterID)->getParameterIndex();
+	C74_GENPLUGIN::setparameter(m_C74PluginState, index, newValue, nullptr);
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout VIVI_SynthAudioProcessor::createParameterLayout()
+{
+	m_C74PluginState = (CommonState*)C74_GENPLUGIN::create(44100, 64);
+	C74_GENPLUGIN::reset(m_C74PluginState);
+
+	juce::AudioProcessorValueTreeState::ParameterLayout layout;
+
+	for (int i = 0; i < C74_GENPLUGIN::num_params(); ++i)
+	{
+		auto name = juce::String(C74_GENPLUGIN::getparametername(m_C74PluginState, i));
+		auto min = C74_GENPLUGIN::getparametermin(m_C74PluginState, i);
+		auto max = C74_GENPLUGIN::getparametermax(m_C74PluginState, i);
+		auto defaultValue = m_C74PluginState->params[i].defaultvalue;
+
+		layout.add(std::make_unique<juce::AudioParameterFloat>(name, name,
+			juce::NormalisableRange<float>(min, max, 0.01f, 1.f),
+			defaultValue,
+			juce::String(),
+			juce::AudioProcessorParameter::genericParameter,
+			nullptr,
+			nullptr));
+	}
+
+	return layout;
+}
 
 void VIVI_SynthAudioProcessor::assureBufferSize(long bufferSize)
 {
@@ -273,4 +312,5 @@ void VIVI_SynthAudioProcessor::assureBufferSize(long bufferSize)
 		
 		m_CurrentBufferSize = bufferSize;
 	}
+
 }
