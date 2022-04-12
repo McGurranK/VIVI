@@ -12,21 +12,22 @@
 #include <JuceHeader.h>
 #include "Themes.h"
 
-typedef struct OscillatorPage: juce::Component,
-	juce::Slider::Listener,Themes
+struct OscillatorPage: juce::Component,
+	juce::Slider::Listener, Themes
 {
 public:
 	Themes Theme;
-
-	int GrabFocus{ 0 };
 
 	// Oscillator Sliders and Vector Storage
 	juce::Slider Osc1, Osc2, Osc3, Osc4, Osc5, Osc6, Spread;
 	std::vector<juce::Slider*> Sliders = { &Osc1,&Osc2,&Osc3,&Osc4,&Osc5,&Osc6, &Spread };
 
 	// Constructor method
-	OscillatorPage(VIVI_SynthAudioProcessor &p): ProcessorRef(p)
+	OscillatorPage(VIVI_SynthAudioProcessor &p)
+	: ProcessorRef(p)
 	{	
+
+		
 		Theme;
 
 		// Loop through vector of objects to seteverything up
@@ -37,13 +38,9 @@ public:
 			addAndMakeVisible(Sliders[i]);
 
 			// Keyboard Functionality
-			Sliders[i]->setWantsKeyboardFocus(true); 
+			Sliders[i]->setWantsKeyboardFocus(true);
 			Sliders[i]->setHasFocusOutline(true);
-
-			// Accessibility
-			Sliders[i]->getAccessibilityHandler();
-
-
+			
 			// Set Default Value
 			Sliders[i]->addListener(this);
 
@@ -53,21 +50,16 @@ public:
 
 			//Label Setup
 			OscLabels[i]->setText(OscillatorLabelNames[i], juce::NotificationType::dontSendNotification);
-			OscLabels[i]->setFont(juce::Font(72.0f, juce::Font::bold));
-			OscLabels[i]->setMinimumHorizontalScale(1);
 			OscLabels[i]->setColour(juce::Label::textColourId, juce::Colours::lightgreen);
-			OscLabels[i]->setJustificationType(juce::Justification::centred);
-			OscLabels[i]->attachToComponent(Sliders[i], false);
-			OscLabels[i]->setBounds(65, 50, 100, 100);
 			OscLabels[i]->setAccessible(false);
 
 			// Slider Layout
 			if (i < 6) {
-			Sliders[i]->setRange(-100, 6, 1);
 			Sliders[i]->setSliderStyle(juce::Slider::SliderStyle::Rotary);              // Set Slider style
 			Sliders[i]->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 200, 30);    // Text Box Setup
-			
-
+			OscLabels[i]->setFont(juce::Font(72.0f, juce::Font::bold));
+			OscLabels[i]->setJustificationType(juce::Justification::centred);
+			OscLabels[i]->attachToComponent(Sliders[i],false);
 			// Positional Information
 				if (i == 0)
 					Sliders[i]->setBounds(20, TopMargin, SliderWidth, SliderHeight);
@@ -91,6 +83,9 @@ public:
 				Sliders[i]->setBounds(20, Sliders[3]->getY() + SliderHeight + 50, 700, 75);
 				Sliders[i]->setRange(0, 4, 0.01);
 				Sliders[i]->setTextBoxStyle(juce::Slider::TextBoxRight, false, 100, 30);    // Text Box Setup
+				OscLabels[i]->setFont(juce::Font(38.0f, juce::Font::bold));
+				OscLabels[i]->setJustificationType(juce::Justification::centredTop);
+
 			}
 		}
 
@@ -116,6 +111,8 @@ public:
 		SpreadAttachment = std::make_unique
 			<juce::AudioProcessorValueTreeState::SliderAttachment>
 			(ProcessorRef.apvts, "Spread", Spread);
+
+		
 	}
 
 	// Destructor
@@ -139,17 +136,12 @@ public:
 				OscLabels[i]->setBounds(SliderX , SliderY , 100, 100);
 			}
 		}
+
 	}
 
 	// Grab foucus and debugging with slider listener
 	void sliderValueChanged(juce::Slider* sliderThatMoved) override;
-	void SliderFocus(int SliderFocus);
 	void ValueChangedFocus(int GenRef, juce::Slider* SliderRef);
-	
-
-	// Keyboard implementation
-	bool OscillatorPage::keyPressed(const juce::KeyPress & press) override;
-	juce::KeyPress key;
 
 
 private:
@@ -190,7 +182,5 @@ private:
 	std::array<int, 7> GenReferenceNumbers = { 9, 12, 11, 8, 7, 10, 14 };
 
 
-
-	VIVI_SynthAudioProcessor& ProcessorRef;
-	
-} OscRef;
+	VIVI_SynthAudioProcessor& ProcessorRef;	
+};

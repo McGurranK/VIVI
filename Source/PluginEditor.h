@@ -25,7 +25,7 @@ class VIVI_SynthAudioProcessorEditor   : public juce::AudioProcessorEditor,
 	juce::Slider::Listener, juce::Button::Listener 
 {
 public:
-    VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioProcessor&);
+    VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioProcessor&, OscillatorPage&);
     ~VIVI_SynthAudioProcessorEditor() override;
 
     //==============================================================================
@@ -35,11 +35,18 @@ public:
 	// override slider functionality
 	void buttonClicked(juce::Button* toggledButton) override;
 	void sliderValueChanged(juce::Slider* sliderThatWasMoved) override;
+	void KeyboardCommandsForPages(int TabIndex, int SliderRef);
 
+	// Sliders and vector container
+	juce::Slider Volume, Gate;
+	std::vector<juce::Slider*> MainControls = { &Volume, &Gate };
+
+	// Slider labels, text array and label vector
+	juce::Label VolumeLabel, GateLabel;
+	std::vector<juce::Label*> MainControlLabels = { &VolumeLabel,&GateLabel };
+	std::array<std::string, 2> MainControlsLabelText = {"Vol","Gate"};
 
 private:
-	// Top Page Labels
-	juce::Label VolumeLabel, GateLabel;
 
 	// Get Screen Size to set reletive size and position
 	juce::Rectangle<int> r = juce::Desktop::getInstance().getDisplays().getMainDisplay().userArea;
@@ -51,8 +58,6 @@ private:
 	float TabIndent{(float) y / 100 }, TabDepth{ (float) y / 10 };
 
 	// Creating Slide objects
-	juce::Slider Volume, Gate;
-	std::vector<juce::Slider*> MainControls = {&Volume, &Gate};
 	float mainControlHeight{ 520 }, mainControlWidth{ 100 }, mainControlY{TabDepth+TabIndent+50};
 
 	// Button One Position X & Y and Size W & H
@@ -65,17 +70,16 @@ private:
 
 	// Buttons and Vectors
 	juce::TextButton  Mute{ "Unmuted" };
-
 	std::vector<juce::TextButton*> Button  ={ &Mute};
-	
+
 	// Key Presses
 	bool keyPressed(const juce::KeyPress & press) override;
-	juce::KeyPress key;
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     VIVI_SynthAudioProcessor& audioProcessor;
-	OscRef* OscReference;
-	
+	OscillatorPage* OscReference = new OscillatorPage(audioProcessor);
+	EffectsPage* EffectsReference = new EffectsPage(audioProcessor);
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VIVI_SynthAudioProcessorEditor)
 };

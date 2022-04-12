@@ -15,7 +15,6 @@
 VIVI_SynthAudioProcessor::VIVI_SynthAudioProcessor() :m_CurrentBufferSize(0) 
 
 {
-
 	// use a default samplerate and vector size here, reset it later
 	m_C74PluginState = (CommonState *)C74_GENPLUGIN::create(44100, 64);
 	C74_GENPLUGIN::reset(m_C74PluginState);
@@ -34,7 +33,6 @@ VIVI_SynthAudioProcessor::VIVI_SynthAudioProcessor() :m_CurrentBufferSize(0)
 		auto name = juce::String(C74_GENPLUGIN::getparametername(m_C74PluginState, i));
 		apvts.addParameterListener(name, this);
 	}
-
 }
 
 VIVI_SynthAudioProcessor::~VIVI_SynthAudioProcessor()
@@ -232,7 +230,7 @@ bool VIVI_SynthAudioProcessor::hasEditor() const
 juce::AudioProcessorEditor* VIVI_SynthAudioProcessor::createEditor()
 {	
 	
-	return new VIVI_SynthAudioProcessorEditor(*this);
+	return new VIVI_SynthAudioProcessorEditor(*this,OscillatorPage(*this));
 	
     //return new juce::GenericAudioProcessorEditor(this);
 	
@@ -294,6 +292,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout VIVI_SynthAudioProcessor::cr
 			nullptr,
 			nullptr));
 	}
+
 
 	return layout;
 }

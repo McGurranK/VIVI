@@ -13,9 +13,13 @@
 struct Themes
 {
 public:
+	int themeSelect{ 2 };
 
-	Themes() 
+	Themes()
 	{	
+		switch (themeSelect)
+		{
+		case 1:
 		OtherLookAndFeel.setColour(juce::Slider::thumbColourId, juce::Colours::purple);
 		OtherLookAndFeel.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::white);
 		OtherLookAndFeel.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::green);
@@ -23,9 +27,41 @@ public:
 		OtherLookAndFeel.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::purple);
 		OtherLookAndFeel.setColour(juce::TextButton::buttonOnColourId, juce::Colours::red);
 		OtherLookAndFeel.setColour(juce::TextButton::buttonColourId, juce::Colours::green);
+			break;
+		case 2:
+			OtherLookAndFeel.setColour(juce::Slider::thumbColourId, juce::Colours::red);
+			OtherLookAndFeel.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::limegreen);
+			OtherLookAndFeel.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::white);
+			OtherLookAndFeel.setColour(juce::Slider::trackColourId, juce::Colours::yellow);
+			OtherLookAndFeel.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::limegreen);
+			OtherLookAndFeel.setColour(juce::TextButton::buttonOnColourId, juce::Colours::limegreen);
+			OtherLookAndFeel.setColour(juce::TextButton::buttonColourId, juce::Colours::white);
+			break;
+		case 3:
+			OtherLookAndFeel.setColour(juce::Slider::thumbColourId, juce::Colours::red);
+			OtherLookAndFeel.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::limegreen);
+			OtherLookAndFeel.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::white);
+			OtherLookAndFeel.setColour(juce::Slider::trackColourId, juce::Colours::yellow);
+			OtherLookAndFeel.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::limegreen);
+			OtherLookAndFeel.setColour(juce::TextButton::buttonOnColourId, juce::Colours::limegreen);
+			OtherLookAndFeel.setColour(juce::TextButton::buttonColourId, juce::Colours::white);
+			break;
+		case 4:
+			OtherLookAndFeel.setColour(juce::Slider::thumbColourId, juce::Colours::red);
+			OtherLookAndFeel.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::limegreen);
+			OtherLookAndFeel.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::white);
+			OtherLookAndFeel.setColour(juce::Slider::trackColourId, juce::Colours::yellow);
+			OtherLookAndFeel.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::limegreen);
+			OtherLookAndFeel.setColour(juce::TextButton::buttonOnColourId, juce::Colours::limegreen);
+			OtherLookAndFeel.setColour(juce::TextButton::buttonColourId, juce::Colours::white);
+			break;
+		}
+
 
 
 	}
+
+	juce::Slider Math;
 
 	// Custom Look
 	juce::LookAndFeel_V4 OtherLookAndFeel;

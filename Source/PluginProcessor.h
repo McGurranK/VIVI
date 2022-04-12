@@ -68,7 +68,6 @@ public:
 	APVTS::ParameterLayout createParameterLayout();
 	APVTS apvts{ *this, nullptr, "Parameters", createParameterLayout() };
 
-
 protected:
 	// c74: since Juce does float sample processing and Gen offers double sample
 	// processing, we need to go through input and output buffers

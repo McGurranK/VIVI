@@ -17,6 +17,7 @@ struct EffectsPage : juce::Component,
 	juce::Slider::Listener, juce::Button::Listener,
 	Themes
 {
+
 	// Constructor
 	EffectsPage(VIVI_SynthAudioProcessor& p) : processorRef (p)
 	{	
@@ -25,28 +26,25 @@ struct EffectsPage : juce::Component,
 	    Freeze.setClickingTogglesState(true);
 		Freeze.setBounds(20,(Effects[5]->getY() + 490), 700, 75);
 
-
-		Effects[0]->setRange(0.00,1.00,0.1);
-		Effects[1]->setRange(0.0,16.0,0.1);
-		Effects[2]->setRange(0.0,200.0,0.1);
-		Effects[3]->setRange(0.0,200.0,0.1);
-		Effects[4]->setRange(0,20000,1);
-		Effects[5]->setRange(0,1,0.01);
 		Freeze.setLookAndFeel(&OtherLookAndFeel);
 
 
 
 		for (auto i = 0; i < Effects.capacity(); i++)
-		{
+		{	
+			// Setting up Colours
 			Effects[i]->setLookAndFeel(&OtherLookAndFeel);
-			addAndMakeVisible(Effects[i]);		// Make all Sliders Visible
-			Effects[i]->setValue(0.00);			// Set Default Value
-			Effects[i]->setAccessible(true);	// Accessible Functions are on for all sliders
-			Effects[i]->setWantsKeyboardFocus(true);
+			// Making Sliders Visible
+			addAndMakeVisible(Effects[i]);
 
-			Effects[i]->setTitle(EffectsNames[i]);
-			Effects[i]->addListener(this);
+			// Accessibility Functionality
+			Effects[i]->getAccessibilityHandler();
+			Effects[i]->setWantsKeyboardFocus(true);
 			Effects[i]->setHasFocusOutline(true);
+			Effects[i]->setDescription(EffectsNames[i]);
+
+			// Listeners
+			Effects[i]->addListener(this);
 			Freeze.addListener(this);
 
 
@@ -112,6 +110,7 @@ struct EffectsPage : juce::Component,
 		Effects.clear();
 		Effects.shrink_to_fit();
 	}
+
 	// Labels
 	void resized()
 	{
@@ -134,12 +133,14 @@ struct EffectsPage : juce::Component,
 	// Slider value normalisation and link to processor
 	void SliderScaler(juce::Slider* Slider,int GenReferenceNumber);
 
-	// Keyboard
-	
-	bool keyPressed(const juce::KeyPress & press) override;
-	juce::KeyPress key;
-
 	Themes Theme;
+
+	// Effects Page
+	juce::Slider Redux, Bitcrush, DelayLFO, AM, FilterCut, FilterQ;	   // Declare Sliders
+	std::vector<juce::Slider*> Effects =							   // Create Slider Vector
+	{ &Redux,&Bitcrush,&DelayLFO, &AM, &FilterCut, &FilterQ };
+	// Freeze Button
+	juce::TextButton Freeze{ "Freeze" };
 
 private:
 
@@ -152,18 +153,10 @@ private:
 	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>mFilterQAttachment;
 	std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment>mFreezeAttachment;
 
-	// Effects Page
-	juce::Slider Redux, Bitcrush, DelayLFO, AM, FilterCut, FilterQ;	   // Declare Sliders
-	std::vector<juce::Slider*> Effects =							   // Create Slider Vector
-	{ &Redux,&Bitcrush,&DelayLFO, &AM, &FilterCut, &FilterQ };
 
 	// Slider Names
 	std::array < std::string, 6 > EffectsNames =
 	{ "Redux","Bitcrush","Delay LFO","Amplitude Mod","Filter Cuttoff","Filter Q" };
-
-	// Freeze Button
-	juce::TextButton Freeze{ "Freeze" };
-
 
 	int SliderWidth{ 200 }, SliderHeight{ 200 }, LeftMargin{ 20 }, TopMargin{ 20 }
 	, SliderDistance{ 250 };
