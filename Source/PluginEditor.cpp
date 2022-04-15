@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 /*
   ==============================================================================
 
@@ -14,47 +16,59 @@
 #include <memory>
 using namespace std;
 
+
 //==============================================================================
 
 VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor 
-(VIVI_SynthAudioProcessor& p, OscillatorPage& O)
+(VIVI_SynthAudioProcessor& p, Themes& T)
     : AudioProcessorEditor (&p), audioProcessor (p)  ,
-	Tab (juce::TabbedButtonBar::Orientation::TabsAtTop)
+	Tab (juce::TabbedButtonBar::Orientation::TabsAtTop), Theme(T)
 {
-	// Size of editor page	
-	setSize(1000, 700);
+	setSize(1000, 700);      // Window Size
+
+	// Setting up object dimenstions
 	int windowWidth{ getWidth() }, WindowTenth{windowWidth/10};
+	float ButtonOneX{ getWidth() - TabIndent - ButtonOneD };
+	float ButtonTwoY{TabIndent - 1};
 
-	float ButtonOneX{ getWidth() - TabIndent - ButtonOneD },
-		ButtonTwoY{TabIndent - 1};
+	// Setting up tab functionality
+	addAndMakeVisible(Tab);        // Add to screen
+	Tab.setAccessible(true);       // This is set to false by default
+	Tab.setHasFocusOutline(true);  // Provides a yellow outline when selected
+	Tab.setWantsKeyboardFocus(true); // Allows focus to be past to this object
+	Tab.setDescription("Oscillator and Effects Tabs"); // Description for screen reader
 
-
-	addAndMakeVisible(Tab);
-	Tab.setAccessible(true);
-
-	// 	Oscillator and Effects Pages setup with GUI objects
-	//	Next Change is keyboard mapping and fixing tabbed interface for accessibility Stuff
-
+	// Adding Oscillator and effects headers to tabbed interface
 	Tab.addTab("Oscillator Page", juce::Colours::linen,OscReference, true);
 	Tab.addTab("Effects Page", juce::Colours::purple, EffectsReference, true);
-	Tab.addTab("Settings Page", juce::Colours::purple, new SettingsPage, true);
-	Tab.setHasFocusOutline(true);
-	Tab.setWantsKeyboardFocus(true);
 
-	for (int i = 0; i < Tab.getNumTabs(); i++)
-		Tab.setTabBackgroundColour(i, juce::Colours::black);
-	
+	// Coded out for testing as not enough time to implement well
+	// Tab.addTab("Settings Page", juce::Colours::purple,SettingsReference, true);
+
+
+	// Looping through MainControls vector that has the volume and Gate sliders
 	for (auto j = 0; j < MainControls.size(); j++)
 	{
+		// Visible
 		addAndMakeVisible(MainControls[j]);
+		// Setting Style
 		MainControls[j]->setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
-		MainControls[j]->setWantsKeyboardFocus(true);
-		MainControls[j]->setAccessible(true);
-		MainControls[j]->setRange(0.00, 1.00, 0.01);
-		MainControls[j]->addListener(this);
-		MainControls[j]->setColour(juce::Slider::trackColourId,juce::Colours::purple);
-		MainControls[j]->setHasFocusOutline(true);
 		MainControls[j]->setTextBoxStyle(juce::Slider::TextBoxBelow,false,500,500);
+
+		// Accessibility
+		MainControls[j]->setWantsKeyboardFocus(true); 
+		MainControls[j]->setAccessible(true); 
+		MainControls[j]->addListener(this); // Only used for audible feedback for tab
+		MainControls[j]->setHasFocusOutline(true);
+
+		// MainControls[j]->setRange(0.00, 1.00, 0.01);
+
+		// Colour, name, and title
+		MainControls[j]->setColour(juce::Slider::trackColourId,juce::Colours::white);
+		MainControls[j]->setColour(juce::Slider::textBoxTextColourId,juce::Colours::red);
+		MainControls[j]->setColour(juce::Slider::textBoxHighlightColourId,juce::Colours::purple);
+		MainControls[j]->setName(MainControlsLabelText[j]);
+		MainControls[j]->setTitle(MainControlsLabelText[j]);
 		
 		// Setting Up Label
 		MainControlLabels[j]->attachToComponent(MainControls[j], false);
@@ -66,46 +80,63 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor
 		MainControlLabels[j]->setAccessible(false);
 
 	}
-
+	// Position for gate and volume controls
+	MainControls[0]->setBounds((windowWidth)-((windowWidth/5)*1.25),(int)mainControlY ,(int)mainControlWidth,(int) mainControlHeight);
+	MainControls[1]->setBounds(MainControls[0]->getX()+WindowTenth+20,(int)mainControlY ,(int)mainControlWidth,(int) mainControlHeight);
+	
+	// Mute Parameter (Put in for safety in testing incase of feedback)
 	addAndMakeVisible(Mute);
 	Mute.setClickingTogglesState(true);
-	Mute.setBounds(ButtonOneX, ButtonTwoY, ButtonOneD, TabDepth);
+	Mute.setBounds((int)ButtonOneX,(int) ButtonTwoY,(int) ButtonOneD, (int)TabDepth);
 	Mute.addListener(this);
 
-	MainControls[0]->setBounds((windowWidth)-((windowWidth/5)*1.25),mainControlY ,mainControlWidth, mainControlHeight);
-	MainControls[1]->setBounds(MainControls[0]->getX()+WindowTenth+20,mainControlY ,mainControlWidth, mainControlHeight);
-
+	// Linking to the apvts for controlling the instrument
+	mVolAttachment = std::make_unique
+		<juce::AudioProcessorValueTreeState::SliderAttachment>
+		(audioProcessor.apvts, "Volume", Volume);
+	mGateAttachment = std::make_unique
+		<juce::AudioProcessorValueTreeState::SliderAttachment>
+		(audioProcessor.apvts, "GateLevel", Gate);
 }
 
-
+// Clearing Memory allocation
 VIVI_SynthAudioProcessorEditor::~VIVI_SynthAudioProcessorEditor()
 {	
+	MainControls.clear();
+	MainControlLabels.clear();
+	MainControls.shrink_to_fit();
+	MainControlLabels.shrink_to_fit();
+
+	juce::LookAndFeel::setDefaultLookAndFeel(nullptr);
+
 	delete OscReference;
 	delete EffectsReference;
+	delete SettingsReference;
+
 }
 
 // ==============================================================================
 void VIVI_SynthAudioProcessorEditor::paint(juce::Graphics& g)
 {
 	g.fillAll(juce::Colours::purple);
-	// Grab Keyboard focus after open
 
+	for (int i = 0; i < Tab.getNumTabs(); i++)
+		Tab.setTabBackgroundColour(i, juce::Colours::black);
+
+
+	// Grabs  focus when window is open
+	VIVI_SynthAudioProcessorEditor::grabKeyboardFocus();
 }
-// Select Volume, Gate and Mute Parameters
 
 bool VIVI_SynthAudioProcessorEditor::keyPressed(const juce::KeyPress & press)
 {
+	// Main Navigation and Control
 	if (press == 'V') MainControls[0]->grabKeyboardFocus();
-
 	else if (press == 'G') MainControls[1]->grabKeyboardFocus();
-
 	else if (press == 'M') Mute.grabKeyboardFocus();
-
-	else if (press == 'O') KeyboardCommandsForPages(0, 0);
-
+	else if (press == 'O') Tab.setCurrentTabIndex(0);
 	else if (press == 'E') Tab.setCurrentTabIndex(1);
-
-	else if (press == 'L') Tab.setCurrentTabIndex(2);
+	// else if (press == 'L') Tab.setCurrentTabIndex(2);
 
 	// Oscillator Page
 	else if (press == ',')KeyboardCommandsForPages(0,0);
@@ -131,8 +162,418 @@ bool VIVI_SynthAudioProcessorEditor::keyPressed(const juce::KeyPress & press)
 		EffectsReference->Freeze.triggerClick();
 	}
 
+	// Increasing and decreasing value with keys/ Up and Down
+	else if (press == juce::KeyPress::rightKey)KeyboardControl(true);
+	else if (press == juce::KeyPress::leftKey)KeyboardControl(false);
+	else if (press == juce::KeyPress::upKey) ArrowTraverser(true);
+	else if (press == juce::KeyPress::downKey) ArrowTraverser(false);
 
 	return 0;
+}
+
+void VIVI_SynthAudioProcessorEditor::KeyboardControl(bool NegOrPlus)
+{
+	int currentTab = Tab.getCurrentTabIndex();
+
+	switch (currentTab)
+	{
+	case 0:
+		if (NegOrPlus) {
+			for (int i = 0; i < OscSize; i++)
+			{
+				Name = OscReference->Sliders[i]->getName();
+				Focus = OscReference->Sliders[i]->getCurrentlyFocusedComponent()->getName();
+
+				VolumeMain = MainControls[0]->getName();
+				VolumeFocusMain = MainControls[0]->getCurrentlyFocusedComponent()->getName();
+				GateMain = MainControls[1]->getName();
+				GateFocusMain = MainControls[1]->getCurrentlyFocusedComponent()->getName();
+				if (Name == Focus)
+				{
+					OscValue = OscReference->Sliders[i]->getValue();
+
+					if (Name == "Spread")
+					{
+						NewValue = OscValue + 0.05;
+						OscReference->Sliders[i]->setValue(NewValue);
+					}
+					else
+					{
+						NewValue = OscValue + 1.0;
+						OscReference->Sliders[i]->setValue(NewValue);
+					}
+
+					break;
+				}
+				else if (VolumeMain == VolumeFocusMain)
+				{
+					MainComponentSelect(0, false);
+					break;
+				}
+				else if (GateMain == GateFocusMain)
+				{
+					MainComponentSelect(1, false);
+					break;
+				}
+
+			}
+		}
+		else
+		{
+			for (int i = 0; i < OscSize; i++)
+			{
+
+				Name = OscReference->Sliders[i]->getName();
+				Focus = OscReference->Sliders[i]->getCurrentlyFocusedComponent()->getName();
+				VolumeMain = MainControls[0]->getName();
+				VolumeFocusMain = MainControls[0]->getCurrentlyFocusedComponent()->getName();
+				GateMain = MainControls[1]->getName();
+				GateFocusMain = MainControls[1]->getCurrentlyFocusedComponent()->getName();
+
+				if (Name == Focus)
+				{
+					OscValue = OscReference->Sliders[i]->getValue();
+					if (Name == "Spread")
+					{
+						NewValue = OscValue - 0.05;
+						OscReference->Sliders[i]->setValue(NewValue);
+					}
+					else
+					{
+						NewValue = OscValue - 1.0;
+						OscReference->Sliders[i]->setValue(NewValue);
+					}
+					break;
+				}
+				else if (VolumeMain == VolumeFocusMain)
+				{
+					MainComponentSelect(0, true);
+					break;
+				}
+				else if (GateMain == GateFocusMain)
+				{
+					MainComponentSelect(1, true);
+					break;
+				}
+
+			}
+		}
+		break;
+
+
+	case 1:
+		if (NegOrPlus) {
+			for (int i = 0; i < EffectsReference->Effects.size(); i++)
+			{
+
+				Name = EffectsReference->Effects[i]->getName();
+				Focus = EffectsReference->Effects[i]->getCurrentlyFocusedComponent()->getName();
+				VolumeMain = MainControls[0]->getName();
+				VolumeFocusMain = MainControls[0]->getCurrentlyFocusedComponent()->getName();
+				GateMain = MainControls[1]->getName();
+				GateFocusMain = MainControls[1]->getCurrentlyFocusedComponent()->getName();
+
+				if (Name == Focus)
+				{
+
+					Effects = EffectsReference->Effects[i]->getValue();
+
+					if (Focus == "Delay LFO" || Focus == "Amplitude Mod")
+					{
+						NewValue = Effects + 1;
+						EffectsReference->Effects[i]->setValue(NewValue);
+						break;
+					}
+					else if (Focus == "Redux" || Focus == "Filter Q")
+					{
+						NewValue = Effects + 0.01;
+						EffectsReference->Effects[i]->setValue(NewValue);
+						break;
+					}
+					else if (Focus == "Filter Cuttoff")
+					{
+						NewValue = Effects + 50.0;
+						EffectsReference->Effects[i]->setValue(NewValue);
+						break;
+					}
+					else if (Name == "Bitcrush")
+					{
+						NewValue = Effects + 0.5;
+						EffectsReference->Effects[i]->setValue(NewValue);
+						break;
+					}
+
+					break;
+				}					
+				else if (VolumeMain == VolumeFocusMain)
+				{
+					MainComponentSelect(0, false);
+					break;
+				}
+				else if (GateMain == GateFocusMain)
+				{
+					MainComponentSelect(1, false);
+					break;
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < EffectsReference->Effects.size(); i++)
+			{
+
+				Name = EffectsReference->Effects[i]->getName();
+				Focus = EffectsReference->Effects[i]->getCurrentlyFocusedComponent()->getName();
+				VolumeMain = MainControls[0]->getName();
+				VolumeFocusMain = MainControls[0]->getCurrentlyFocusedComponent()->getName();
+				GateMain = MainControls[1]->getName();
+				GateFocusMain = MainControls[1]->getCurrentlyFocusedComponent()->getName();
+
+				if (Name == Focus) {
+
+					Effects = EffectsReference->Effects[i]->getValue();
+
+					if (Focus == "Delay LFO" || Focus == "Amplitude Mod")
+					{
+						NewValue = Effects - 1;
+						EffectsReference->Effects[i]->setValue(NewValue);
+						break;
+					}
+					else if (Focus == "Redux" || Focus == "Filter Q")
+					{
+						NewValue = Effects - 0.01;
+						EffectsReference->Effects[i]->setValue(NewValue);
+						break;
+					}
+					else if (Focus == "Filter Cuttoff")
+					{
+					NewValue = Effects - 50.0;
+					EffectsReference->Effects[i]->setValue(NewValue);
+					break;
+					}
+					else if (Name == "Bitcrush")
+					{
+					NewValue = Effects - 0.5;
+					EffectsReference->Effects[i]->setValue(NewValue);
+					break;
+					}
+
+				break;
+
+				}
+				else if (VolumeMain == VolumeFocusMain)
+				{
+					MainComponentSelect(0, true);
+					break;
+				}
+				else if (GateMain == GateFocusMain)
+				{
+					MainComponentSelect(1, true);
+					break;
+				}
+			}
+		}
+		break;
+	}
+}
+
+void VIVI_SynthAudioProcessorEditor::ArrowTraverser(bool UpDown)
+{
+	// What tab is the user currently on
+	int currentTab = Tab.getCurrentTabIndex();
+	
+	switch (currentTab)
+	{
+	case 0:
+		// If upbutton pressed
+		if (UpDown) {
+			for (int i = 0; i < OscReference->Sliders.size(); i++)
+			{
+				NameOsc = OscReference->Sliders[i]->getName();
+				FocusOsc = OscReference->Sliders[i]->getCurrentlyFocusedComponent()->getName();
+				
+				// Oscillator and spread Sliders Focus
+				if (NameOsc == FocusOsc)
+				{
+					if (i < 6) OscReference->Sliders[i + 1]->grabKeyboardFocus();
+					else MainControls[0]->grabKeyboardFocus();
+					break;
+				}
+
+				// Main Sliders Focus
+				else if (VolumeMain == VolumeFocusMain)
+				{
+					MainControls[1]->grabKeyboardFocus();
+					break;
+				}
+				else if (GateMain == GateFocusMain)
+				{
+					OscReference->Sliders[0]->grabKeyboardFocus();
+					break;
+				}				
+			}
+			break;
+		}
+
+		// If down arrow pressed
+		else
+		{
+			for (int i = 0; i < OscReference->Sliders.size(); i++)
+			{
+				
+				NameOsc = OscReference->Sliders[i]->getName();
+				FocusOsc = OscReference->Sliders[i]->getCurrentlyFocusedComponent()->getName();
+				VolumeMain = MainControls[0]->getName();
+				VolumeFocusMain = MainControls[0]->getCurrentlyFocusedComponent()->getName();
+				GateMain = MainControls[1]->getName();
+				GateFocusMain = MainControls[1]->getCurrentlyFocusedComponent()->getName();
+				if (NameOsc == FocusOsc)
+				{
+					if (i != 0)
+					{
+						OscReference->Sliders[i - 1]->grabKeyboardFocus();
+						break;
+					}
+					else
+					{
+						MainControls[1]->grabKeyboardFocus();
+						break;
+					}
+					break;
+				}
+				else if (GateMain == GateFocusMain)
+				{
+					MainControls[0]->grabKeyboardFocus();
+					break;
+				}
+				else if (VolumeMain == VolumeFocusMain)
+				{
+					OscReference->Sliders[6]->grabKeyboardFocus();
+					break;
+				}
+				
+			}
+			break;
+		}
+	case 1:
+		if (UpDown) {
+			for (int i = 0; i < EffectsReference->Effects.size(); i++)
+			{
+				
+				NameEffects = EffectsReference->Effects[i]->getName();
+				FocusEffects = EffectsReference->Effects[i]->getCurrentlyFocusedComponent()->getName();
+				FreezeEffects = EffectsReference->Freeze.getName();
+				FreezeFocusEffects = EffectsReference->Freeze.getCurrentlyFocusedComponent()->getName();
+				VolumeMain = MainControls[0]->getName();
+				VolumeFocusMain = MainControls[0]->getCurrentlyFocusedComponent()->getName();
+				GateMain = MainControls[1]->getName();
+				GateFocusMain = MainControls[1]->getCurrentlyFocusedComponent()->getName();
+
+				if (NameEffects == FocusEffects)
+				{
+					if (i < 5)
+					{
+						EffectsReference->Effects[i + 1]->grabKeyboardFocus();
+					}
+					else
+					{
+						EffectsReference->Freeze.grabKeyboardFocus();
+					}
+					break;
+				}
+				else if (FreezeEffects == FreezeFocusEffects)
+				{
+					MainControls[0]->grabKeyboardFocus();
+					break;
+				}
+				else if (VolumeMain == VolumeFocusMain)
+				{
+					MainControls[1]->grabKeyboardFocus();
+					break;
+				}
+				else if (GateMain == GateFocusMain)
+				{
+					EffectsReference->Effects[0]->grabKeyboardFocus();
+					break;
+				}
+				
+
+			}
+			break;
+		}
+		
+		else
+		{
+			
+			for (int i = 0; i < EffectsReference->Effects.size(); i++)
+			{
+				
+				NameEffects = EffectsReference->Effects[i]->getName();
+				FocusEffects = EffectsReference->Effects[i]->getCurrentlyFocusedComponent()->getName();
+				FreezeEffects = EffectsReference->Freeze.getName();
+				FreezeFocusEffects = EffectsReference->Freeze.getCurrentlyFocusedComponent()->getName();
+				VolumeMain = MainControls[0]->getName();
+				VolumeFocusMain = MainControls[0]->getCurrentlyFocusedComponent()->getName();
+				GateMain = MainControls[1]->getName();
+				GateFocusMain = MainControls[1]->getCurrentlyFocusedComponent()->getName();
+
+				if (NameEffects == FocusEffects)
+				{
+					if (i != 0)
+					{
+						EffectsReference->Effects[i - 1]->grabKeyboardFocus();
+					}
+					else
+					{
+						MainControls[1]->grabKeyboardFocus();
+					}
+					break;
+				}
+				else if (GateMain == GateFocusMain)
+				{
+					MainControls[0]->grabKeyboardFocus();
+					break;
+				}
+				else if (VolumeMain == VolumeFocusMain)
+				{
+					EffectsReference->Freeze.grabKeyboardFocus();
+					break;
+				}
+				else if (FreezeEffects == FreezeFocusEffects)
+				{
+					EffectsReference->Effects[5]->grabKeyboardFocus();
+					break;
+				}
+				
+			}
+			break;
+
+		}
+	}
+}
+
+// Code to slect betwen the Gate and Volume control and +/-
+// MainComp selects between volume 0 and gate 1
+// PlusNeg if false +--------if true +
+void VIVI_SynthAudioProcessorEditor::MainComponentSelect(int MainComp, bool PlusNeg)
+{
+	switch (MainComp)
+	{
+	case 0:
+			MainValue = MainControls[0]->getValue();
+			if (PlusNeg) NewValue = MainValue - 0.05;
+			else NewValue = MainValue + 0.05;
+			MainControls[0]->setValue(NewValue);
+			break;
+
+	case 1:
+			MainValue = MainControls[1]->getValue();
+			if (PlusNeg) NewValue = MainValue - 0.05;
+			else NewValue = MainValue + 0.05;
+			MainControls[1]->setValue(NewValue);
+			break;
+	}
+
 }
 
 void VIVI_SynthAudioProcessorEditor::KeyboardCommandsForPages
@@ -151,52 +592,25 @@ void VIVI_SynthAudioProcessorEditor::KeyboardCommandsForPages
 	case 2:		break;
 	}
 }
-void SettingsPage::buttonClicked(juce::Button* Button)
-{
-}
-
+#
 void VIVI_SynthAudioProcessorEditor::resized()
 {
-
 	// Border for Tab Interface
 	Tab.setBounds(getLocalBounds().reduced(TabIndent));
 	Tab.setTabBarDepth(TabDepth);
-
 }
 
-void VIVI_SynthAudioProcessorEditor::sliderValueChanged(juce::Slider* sliderThatMoved)
-{
-	// Gain Slider Hook
-	if (sliderThatMoved == MainControls[0])
-	{
-		float VolumeSlider = sliderThatMoved->getValue();
-		sliderThatMoved->grabKeyboardFocus();
-		audioProcessor.setParameter(15, VolumeSlider);
-	}
-
-	// Gate Slider Hook
-	else if (sliderThatMoved == MainControls[0])
-	{
-		float GateSlider = sliderThatMoved->getValue();
-		sliderThatMoved->grabKeyboardFocus();
-		audioProcessor.setParameter(6, GateSlider);
-
-	}
-}
 
 // Mute Button On and off
 void VIVI_SynthAudioProcessorEditor::buttonClicked(juce::Button* toggledButton)
 {
-	int ProcessorState = 1;
-
 	if (toggledButton == &Mute)
 	{
 		bool Togglestate = Mute.getToggleState();
-
+		int ProcessorState = 1;
 		// If True set mute parameter to 1. if false 0
 		if (Togglestate == true) 
 		{
-			ProcessorState = 1;
 			Mute.setDescription("ON");
 		}
 		else 
@@ -209,50 +623,81 @@ void VIVI_SynthAudioProcessorEditor::buttonClicked(juce::Button* toggledButton)
 
 }
 
-/// Oscillator Page
+ 
+// Settings Page
 
-// Listener only used for focus and debgging APVTS implementation
+void SettingsPage::buttonClicked(juce::Button* Button)
+{
+	if (Button == ThemeContainer[0])
+	{
+		bool Out = Button->getToggleState();
+		if (Out == true)
+		{
+			SettingsPage::sendLookAndFeelChange();
+		}
+		else
+		{
+			OtherLookAndFeel.setColour(juce::TextButton::buttonOnColourId, juce::Colours::pink);
+			SettingsPage::sendLookAndFeelChange();
+		}
+	}
+}
+
+// This implementation for listeners is less than ideal
+// Repeatition doesn't legitamise this poor implmentation of slider listeners for focus
+// The for loop is nice though
+
+// Main Control Listener
+void VIVI_SynthAudioProcessorEditor::sliderValueChanged(juce::Slider* sliderThatMoved)
+{
+	for (int i = 0; i < MainControls.size(); i++)
+	{
+		if (sliderThatMoved == MainControls[i])
+		{
+			juce::Component* MainFocus = sliderThatMoved->getCurrentlyFocusedComponent();
+			if (MainFocus != nullptr)
+			{
+				sliderThatMoved->grabKeyboardFocus();
+			}
+		}
+	}
+}
+// Oscillator Page Listener
 void OscillatorPage::sliderValueChanged(juce::Slider* sliderThatMoved)
 {
-	if		(sliderThatMoved == Sliders[0])	ValueChangedFocus(9,sliderThatMoved); // Oscillator One
-	else if (sliderThatMoved == Sliders[1])ValueChangedFocus(12, sliderThatMoved); // Oscillator Two
-	else if (sliderThatMoved == Sliders[2]) ValueChangedFocus(11, sliderThatMoved); // Oscillator Three
-	else if (sliderThatMoved == Sliders[3]) ValueChangedFocus(8, sliderThatMoved);	// Oscillator Four
-	else if (sliderThatMoved == Sliders[4]) ValueChangedFocus(7, sliderThatMoved); // Oscillator Five
-	else if (sliderThatMoved == Sliders[5]) ValueChangedFocus(10, sliderThatMoved); // Oscillator Six
-	else if (sliderThatMoved == Sliders[6]) ValueChangedFocus(14, sliderThatMoved); // Spread Control
-}
+	// If the slider value changes give that parameter keyboard focus
+	// AKA let accessibility handler know that the value has changed
+	for (int i = 0; i < Sliders.size(); i++) 
+	{
+		if (sliderThatMoved == Sliders[i])
+		{
+			juce::Component* SliderFocus = sliderThatMoved->getCurrentlyFocusedComponent();
+			if (SliderFocus != nullptr)
+			{
+				sliderThatMoved->grabKeyboardFocus();
+			}
 
-// Gives Focus and prints variable for debugging
-void OscillatorPage::ValueChangedFocus(int GenRef, juce::Slider* SliderRef)
+		}
+	}
+}
+// Effects Listener
+void EffectsPage::sliderValueChanged(juce::Slider* sliderThatMoved)
 {
-	
-		//SliderRef->grabKeyboardFocus();
+	for (int i = 0; i < Effects.size(); i++)
+	{
+		if (sliderThatMoved == Effects[i])
+		{
+			juce::Component* EffectsSlidersFocus = sliderThatMoved->getCurrentlyFocusedComponent();
+			if (EffectsSlidersFocus != nullptr)
+			{
+				sliderThatMoved->grabKeyboardFocus();
+			}
+
+		}
+	}
 }
 
-
-/////// Effects Page
-
-// Linking all Parameters to Gen Processor
-void EffectsPage::sliderValueChanged(juce::Slider* slider)
-{	
-
-	if (slider == Effects[0])SliderScaler(slider, 13);	// setting Redux 
-	else if(slider == Effects[1]) SliderScaler(slider,1); // Setting Up Bitcrush
-	else if (slider == Effects[2]) SliderScaler(slider, 2); // Setting Up Delay LFO
-	else if (slider == Effects[3]) SliderScaler(slider, 0); // Setting Up AM
-	else if (slider == Effects[4]) SliderScaler(slider, 3); // Setting Up Filter Cut
-	else if (slider == Effects[5]) SliderScaler(slider, 4); // Setting Up Filter Q
-
-}
-
-// Scaling Effects Parameters to be normalised range for Gen Parameters and linking to processor
-void EffectsPage::SliderScaler(juce::Slider* slider, int GenReferenceNumber)
-{	
-
-}
-
-// Toggle Button Text
+// Toggle Button
 void EffectsPage::buttonClicked(juce::Button* Button)
 {	
 	if (Button == &Freeze)
@@ -262,4 +707,3 @@ void EffectsPage::buttonClicked(juce::Button* Button)
 		else Freeze.setButtonText("Unfrozen");
 	}
 }
- 

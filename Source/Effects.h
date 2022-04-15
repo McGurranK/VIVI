@@ -13,27 +13,26 @@
 #include "Themes.h"
 
 
-struct EffectsPage : juce::Component,
-	juce::Slider::Listener, juce::Button::Listener,
-	Themes
+struct EffectsPage : juce::Component, juce::Button::Listener, Themes,
+juce::Slider::Listener
 {
 
 	// Constructor
 	EffectsPage(VIVI_SynthAudioProcessor& p) : processorRef (p)
 	{	
+
 		Theme;
 		addAndMakeVisible(Freeze);
 	    Freeze.setClickingTogglesState(true);
 		Freeze.setBounds(20,(Effects[5]->getY() + 490), 700, 75);
-
 		Freeze.setLookAndFeel(&OtherLookAndFeel);
-
 
 
 		for (auto i = 0; i < Effects.capacity(); i++)
 		{	
 			// Setting up Colours
 			Effects[i]->setLookAndFeel(&OtherLookAndFeel);
+
 			// Making Sliders Visible
 			addAndMakeVisible(Effects[i]);
 
@@ -42,8 +41,7 @@ struct EffectsPage : juce::Component,
 			Effects[i]->setWantsKeyboardFocus(true);
 			Effects[i]->setHasFocusOutline(true);
 			Effects[i]->setDescription(EffectsNames[i]);
-
-			// Listeners
+			Effects[i]->setName(EffectsNames[i]);
 			Effects[i]->addListener(this);
 			Freeze.addListener(this);
 
@@ -101,6 +99,7 @@ struct EffectsPage : juce::Component,
 		mFreezeAttachment = std::make_unique
 			<juce::AudioProcessorValueTreeState::ButtonAttachment>
 			(processorRef.apvts, "Freeze", Freeze);
+		
 	}
 	
 	// Destructor
@@ -109,6 +108,8 @@ struct EffectsPage : juce::Component,
 		// Clearing vector from memory
 		Effects.clear();
 		Effects.shrink_to_fit();
+		EffectsLabels.clear();
+		EffectsLabels.shrink_to_fit();
 	}
 
 	// Labels
@@ -117,22 +118,18 @@ struct EffectsPage : juce::Component,
 
 		for (int i = 0; i < Effects.size(); i++)
 		{
-			float SliderY = Effects[i]->getY();
-			float SliderX = Effects[i]->getX();
+			int SliderY = Effects[i]->getY();
+			int SliderX = Effects[i]->getX();
 			EffectsLabels[i]->setBounds(SliderX + 50, SliderY + 30, 100, 100);
 
 		}
+		EffectsPage::sendLookAndFeelChange();
 	}
 
 	// Button Listener
 	void buttonClicked(juce::Button* Button) override;
+	void sliderValueChanged(juce::Slider* sliderThatMoved) override;
 	
-	// Slider Listener
-	void sliderValueChanged(juce::Slider* slider) override;
-
-	// Slider value normalisation and link to processor
-	void SliderScaler(juce::Slider* Slider,int GenReferenceNumber);
-
 	Themes Theme;
 
 	// Effects Page
@@ -177,4 +174,6 @@ private:
 
 	// Processor Reference to link Sliders to plugins
 	VIVI_SynthAudioProcessor& processorRef;
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EffectsPage)
 };

@@ -12,23 +12,18 @@
 #include <JuceHeader.h>
 #include "Themes.h"
 
-struct OscillatorPage: juce::Component,
-	juce::Slider::Listener, Themes
+struct OscillatorPage: juce::Component, Themes, juce::Slider::Listener
 {
 public:
-	Themes Theme;
 
 	// Oscillator Sliders and Vector Storage
 	juce::Slider Osc1, Osc2, Osc3, Osc4, Osc5, Osc6, Spread;
 	std::vector<juce::Slider*> Sliders = { &Osc1,&Osc2,&Osc3,&Osc4,&Osc5,&Osc6, &Spread };
 
 	// Constructor method
-	OscillatorPage(VIVI_SynthAudioProcessor &p)
-	: ProcessorRef(p)
+	OscillatorPage(VIVI_SynthAudioProcessor &p, Themes &T)
+	: ProcessorRef(p), Theme(T)
 	{	
-
-		
-		Theme;
 
 		// Loop through vector of objects to seteverything up
 		for (auto i = 0; i < Sliders.capacity(); i++)
@@ -40,8 +35,7 @@ public:
 			// Keyboard Functionality
 			Sliders[i]->setWantsKeyboardFocus(true);
 			Sliders[i]->setHasFocusOutline(true);
-			
-			// Set Default Value
+			Sliders[i]->setName(OscilllatorNames[i]);
 			Sliders[i]->addListener(this);
 
 			// Look and text
@@ -50,7 +44,7 @@ public:
 
 			//Label Setup
 			OscLabels[i]->setText(OscillatorLabelNames[i], juce::NotificationType::dontSendNotification);
-			OscLabels[i]->setColour(juce::Label::textColourId, juce::Colours::lightgreen);
+			OscLabels[i]->setLookAndFeel(&OtherLookAndFeel);
 			OscLabels[i]->setAccessible(false);
 
 			// Slider Layout
@@ -90,24 +84,26 @@ public:
 		}
 
 		// Initalise all slider Linking to APVTS
-		mOscAttachment = std::make_unique
-			<juce::AudioProcessorValueTreeState::SliderAttachment>
+		mOscAttachment = std::make_unique <juce::AudioProcessorValueTreeState::SliderAttachment>
 			(ProcessorRef.apvts,"OscOneVol",Osc1);
-		mOscTwoAttachment = std::make_unique
-			<juce::AudioProcessorValueTreeState::SliderAttachment>
+
+		mOscTwoAttachment = std::make_unique <juce::AudioProcessorValueTreeState::SliderAttachment>
 			(ProcessorRef.apvts, "OscTwoVol", Osc2);
-		mOscThreeAttachment = std::make_unique
-			<juce::AudioProcessorValueTreeState::SliderAttachment>
+
+		mOscThreeAttachment = std::make_unique <juce::AudioProcessorValueTreeState::SliderAttachment>
 			(ProcessorRef.apvts, "OscThreeVol", Osc3);
-		mOscFourAttachment = std::make_unique
-			<juce::AudioProcessorValueTreeState::SliderAttachment>
+
+		mOscFourAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>
 			(ProcessorRef.apvts, "OscFourVol", Osc4);
+
 		mOscFiveAttachment = std::make_unique
 			<juce::AudioProcessorValueTreeState::SliderAttachment>
 			(ProcessorRef.apvts, "OscFiveVol", Osc5);
+
 		mOscSixAttachment = std::make_unique
 			<juce::AudioProcessorValueTreeState::SliderAttachment>
 			(ProcessorRef.apvts, "OscSixVol", Osc6);
+
 		SpreadAttachment = std::make_unique
 			<juce::AudioProcessorValueTreeState::SliderAttachment>
 			(ProcessorRef.apvts, "Spread", Spread);
@@ -116,15 +112,23 @@ public:
 	}
 
 	// Destructor
-	~OscillatorPage(){}
+	~OscillatorPage()
+	{
+		/*
+		Sliders.clear();
+		Sliders.shrink_to_fit();
+		OscLabels.clear();
+		OscLabels.shrink_to_fit();
+		*/
+	}
 
 	// Positioning Labels for componenets
 	void resized()
 	{
 		for (int i = 0; i < Sliders.size(); i++)
 		{	
-			float SliderY = Sliders[i]->getY();
-			float SliderX = Sliders[i]->getX();
+			int SliderY = Sliders[i]->getY();
+			int SliderX = Sliders[i]->getX();
 			if (i < 6) 
 			{
 
@@ -141,8 +145,8 @@ public:
 
 	// Grab foucus and debugging with slider listener
 	void sliderValueChanged(juce::Slider* sliderThatMoved) override;
-	void ValueChangedFocus(int GenRef, juce::Slider* SliderRef);
 
+	double NewValue{ 0 };
 
 private:
 
@@ -159,15 +163,7 @@ private:
 	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>mOscSixAttachment;
 	std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>SpreadAttachment;
 
-
-	// Array with all slider names to step through
-	std::array < std::string, 7 > OscilllatorNames =
-	{
-	  "Oscillator One","Oscillator Two","Oscilator Three","Oscillator Four",
-	  "Oscillator Five","Oscillator Six","Spread"
-	};
-
-	// Slider Labels and labe text
+	// Slider Labels and label text
 	juce::Label OscillatorOneLabel, OscillatorTwoLabel,
 		OscillatorThreeLabel, OscillatorFourLabel, OscillatorFiveLabel,
 		OscillatorSixLabel, SpreadLabel;
@@ -176,11 +172,21 @@ private:
 		&OscillatorThreeLabel, &OscillatorFourLabel, &OscillatorFiveLabel,
 		&OscillatorSixLabel, &SpreadLabel };
 
+	// Labels for Oscillator
 	std::array<std::string, 7> OscillatorLabelNames =
 	{ "1","2","3","4","5","6","Spread" };
 
+	// Array with all slider names to step through
+	std::array < std::string, 7 > OscilllatorNames =
+	{
+	  "Oscillator One","Oscillator Two","Oscilator Three","Oscillator Four",
+	  "Oscillator Five","Oscillator Six","Spread"
+	};
+	// Gen Slider Allocations
 	std::array<int, 7> GenReferenceNumbers = { 9, 12, 11, 8, 7, 10, 14 };
+	
+	Themes &Theme;
 
-
+	// Processor Refernece
 	VIVI_SynthAudioProcessor& ProcessorRef;	
 };

@@ -75,7 +75,6 @@ protected:
 	
 private:
     //==============================================================================
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VIVI_SynthAudioProcessor)
 
 	CommonState				*m_C74PluginState;
 	
@@ -83,7 +82,7 @@ private:
 	t_sample				**m_InputBuffers;
 	t_sample				**m_OutputBuffers;
 
-  
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VIVI_SynthAudioProcessor)
 };
 
 

@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 /*
   ==============================================================================
 
@@ -37,6 +39,8 @@ VIVI_SynthAudioProcessor::VIVI_SynthAudioProcessor() :m_CurrentBufferSize(0)
 
 VIVI_SynthAudioProcessor::~VIVI_SynthAudioProcessor()
 {
+	delete m_InputBuffers;
+	delete m_OutputBuffers;
 	C74_GENPLUGIN::destroy(m_C74PluginState);
 }
 
@@ -230,7 +234,7 @@ bool VIVI_SynthAudioProcessor::hasEditor() const
 juce::AudioProcessorEditor* VIVI_SynthAudioProcessor::createEditor()
 {	
 	
-	return new VIVI_SynthAudioProcessorEditor(*this,OscillatorPage(*this));
+	return new VIVI_SynthAudioProcessorEditor(*this,Themes());
 	
     //return new juce::GenericAudioProcessorEditor(this);
 	
