@@ -61,8 +61,6 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor
 		MainControls[j]->addListener(this); // Only used for audible feedback for tab
 		MainControls[j]->setHasFocusOutline(true);
 
-		// MainControls[j]->setRange(0.00, 1.00, 0.01);
-
 		// Colour, name, and title
 		MainControls[j]->setColour(juce::Slider::trackColourId,juce::Colours::white);
 		MainControls[j]->setColour(juce::Slider::textBoxTextColourId,juce::Colours::red);

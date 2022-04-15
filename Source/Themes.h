@@ -27,7 +27,6 @@ public:
 		OtherLookAndFeel.setColour(juce::TextButton::buttonColourId, juce::Colours::green);
 
 	}
-	
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Themes)
 };

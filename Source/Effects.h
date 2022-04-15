@@ -20,7 +20,6 @@ juce::Slider::Listener
 	// Constructor
 	EffectsPage(VIVI_SynthAudioProcessor& p) : processorRef (p)
 	{	
-
 		Theme;
 		addAndMakeVisible(Freeze);
 	    Freeze.setClickingTogglesState(true);
