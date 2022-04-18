@@ -42,6 +42,7 @@ juce::Slider::Listener
 			Effects[i]->setDescription(EffectsNames[i]);
 			Effects[i]->setName(EffectsNames[i]);
 			Effects[i]->addListener(this);
+			
 			Freeze.addListener(this);
 
 
@@ -53,7 +54,7 @@ juce::Slider::Listener
 			EffectsLabels[i]->setText(EffectsLabelNames[i], juce::NotificationType::dontSendNotification);
 			EffectsLabels[i]->setFont(juce::Font(28.0f, juce::Font::bold));
 			EffectsLabels[i]->setMinimumHorizontalScale(1);
-			EffectsLabels[i]->setColour(juce::Label::textColourId, juce::Colours::lightgreen);
+			EffectsLabels[i]->setColour(juce::Label::textColourId, juce::Colours::white);
 			EffectsLabels[i]->setJustificationType(juce::Justification::centred);
 			EffectsLabels[i]->attachToComponent(Effects[i], false);
 			EffectsLabels[i]->setBounds(65, 50, 100, 100);
@@ -136,7 +137,7 @@ juce::Slider::Listener
 	std::vector<juce::Slider*> Effects =							   // Create Slider Vector
 	{ &Redux,&Bitcrush,&DelayLFO, &AM, &FilterCut, &FilterQ };
 	// Freeze Button
-	juce::TextButton Freeze{ "Freeze" };
+	juce::TextButton Freeze{};
 
 private:
 

@@ -10,7 +10,7 @@
 #pragma once
 #include "juceheader.h"
 
-struct Themes
+struct Themes: public juce::LookAndFeel_V4
 {
 public:
 	// Custom Look
@@ -20,11 +20,14 @@ public:
 
 		OtherLookAndFeel.setColour(juce::Slider::thumbColourId, juce::Colours::purple);
 		OtherLookAndFeel.setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::white);
-		OtherLookAndFeel.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::green);
+		OtherLookAndFeel.setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::yellow);
 		OtherLookAndFeel.setColour(juce::Slider::trackColourId, juce::Colours::purple);
+		OtherLookAndFeel.setColour(juce::Slider::textBoxTextColourId, juce::Colours::white);
 		OtherLookAndFeel.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::purple);
-		OtherLookAndFeel.setColour(juce::TextButton::buttonOnColourId, juce::Colours::red);
-		OtherLookAndFeel.setColour(juce::TextButton::buttonColourId, juce::Colours::green);
+		OtherLookAndFeel.setColour(juce::TextButton::buttonOnColourId, juce::Colours::white);
+		OtherLookAndFeel.setColour(juce::TextButton::buttonColourId, juce::Colours::yellow);
+		OtherLookAndFeel.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
+		OtherLookAndFeel.setColour(juce::TextButton::textColourOffId, juce::Colours::black);
 
 	}
 

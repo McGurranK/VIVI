@@ -22,7 +22,8 @@
 /**
 */
 class VIVI_SynthAudioProcessorEditor   : public juce::AudioProcessorEditor,
-	juce::Slider::Listener, juce::Button::Listener 
+	juce::Slider::Listener
+	//juce::Button::Listener 
 {
 public:
     VIVI_SynthAudioProcessorEditor (VIVI_SynthAudioProcessor&,Themes&);
@@ -33,7 +34,7 @@ public:
     void resized() override;
 	
 	// override slider functionality
-	void buttonClicked(juce::Button* toggledButton) override;
+	//void buttonClicked(juce::Button* toggledButton) override;
 	void sliderValueChanged(juce::Slider* sliderThatWasMoved) override;
 	void KeyboardCommandsForPages(int TabIndex, int SliderRef);
 	void KeyboardControl(bool NegOrPlus);

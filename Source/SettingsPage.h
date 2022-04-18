@@ -12,7 +12,8 @@
 #include "juceheader.h"
 #include "Themes.h"
 
-struct SettingsPage : juce::Component, juce::Button::Listener, Themes
+struct SettingsPage : juce::Component, Themes
+	//juce::Button::Listener
 {
 
 	Themes Themes;
@@ -39,7 +40,7 @@ struct SettingsPage : juce::Component, juce::Button::Listener, Themes
 			ThemeContainer[i]->setClickingTogglesState(true);
 			ThemeContainer[i]->setLookAndFeel(&OtherLookAndFeel);
 			ThemeContainer[i]->setBounds(ButtonWidth[i], ButtonHeight[i], ButtonX, ButtonY);
-			ThemeContainer[i]->addListener(this);
+			//ThemeContainer[i]->addListener(this);
 		}
 	
 	}
@@ -50,7 +51,7 @@ struct SettingsPage : juce::Component, juce::Button::Listener, Themes
 	}
 
 	// Button Listener
-	void buttonClicked(juce::Button* Button) override;
+	// void buttonClicked(juce::Button* Button) override;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SettingsPage)
 };

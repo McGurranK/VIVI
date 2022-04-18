@@ -7,7 +7,6 @@
 
   ==============================================================================
 */
-
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "Oscillator.h"
@@ -18,7 +17,7 @@ using namespace std;
 
 
 //==============================================================================
-
+// Constructor for the editor page
 VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor 
 (VIVI_SynthAudioProcessor& p, Themes& T)
     : AudioProcessorEditor (&p), audioProcessor (p)  ,
@@ -47,6 +46,7 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor
 
 
 	// Looping through MainControls vector that has the volume and Gate sliders
+	// Saves having to call the same function twice
 	for (auto j = 0; j < MainControls.size(); j++)
 	{
 		// Visible
@@ -62,8 +62,8 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor
 		MainControls[j]->setHasFocusOutline(true);
 
 		// Colour, name, and title
-		MainControls[j]->setColour(juce::Slider::trackColourId,juce::Colours::white);
-		MainControls[j]->setColour(juce::Slider::textBoxTextColourId,juce::Colours::red);
+		MainControls[j]->setColour(juce::Slider::trackColourId,juce::Colours::purple);
+		MainControls[j]->setColour(juce::Slider::textBoxTextColourId,juce::Colours::white);
 		MainControls[j]->setColour(juce::Slider::textBoxHighlightColourId,juce::Colours::purple);
 		MainControls[j]->setName(MainControlsLabelText[j]);
 		MainControls[j]->setTitle(MainControlsLabelText[j]);
@@ -72,22 +72,23 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor
 		MainControlLabels[j]->attachToComponent(MainControls[j], false);
 		MainControlLabels[j]->setFont(juce::Font(42.0f, juce::Font::bold));
 		MainControlLabels[j]->setText(MainControlsLabelText[j], juce::NotificationType::dontSendNotification);
-		MainControlLabels[j]->setColour(juce::Label::textColourId, juce::Colours::lightgreen);
+		MainControlLabels[j]->setColour(juce::Label::textColourId, juce::Colours::white);
 		MainControlLabels[j]->setJustificationType(juce::Justification::centredTop);
 		MainControlLabels[j]->setBounds(65, 50, 100, 100);
 		MainControlLabels[j]->setAccessible(false);
-
 	}
+
 	// Position for gate and volume controls
 	MainControls[0]->setBounds((windowWidth)-((windowWidth/5)*1.25),(int)mainControlY ,(int)mainControlWidth,(int) mainControlHeight);
 	MainControls[1]->setBounds(MainControls[0]->getX()+WindowTenth+20,(int)mainControlY ,(int)mainControlWidth,(int) mainControlHeight);
 	
 	// Mute Parameter (Put in for safety in testing incase of feedback)
+	/*
 	addAndMakeVisible(Mute);
 	Mute.setClickingTogglesState(true);
 	Mute.setBounds((int)ButtonOneX,(int) ButtonTwoY,(int) ButtonOneD, (int)TabDepth);
 	Mute.addListener(this);
-
+	*/
 	// Linking to the apvts for controlling the instrument
 	mVolAttachment = std::make_unique
 		<juce::AudioProcessorValueTreeState::SliderAttachment>
@@ -123,9 +124,10 @@ void VIVI_SynthAudioProcessorEditor::paint(juce::Graphics& g)
 
 
 	// Grabs  focus when window is open
-	VIVI_SynthAudioProcessorEditor::grabKeyboardFocus();
+	// VIVI_SynthAudioProcessorEditor::grabKeyboardFocus();
 }
 
+// Key press listener
 bool VIVI_SynthAudioProcessorEditor::keyPressed(const juce::KeyPress & press)
 {
 	// Main Navigation and Control
@@ -176,6 +178,7 @@ void VIVI_SynthAudioProcessorEditor::KeyboardControl(bool NegOrPlus)
 	switch (currentTab)
 	{
 	case 0:
+		// Used to add an amount to the selected parameter.
 		if (NegOrPlus) {
 			for (int i = 0; i < OscSize; i++)
 			{
@@ -216,6 +219,7 @@ void VIVI_SynthAudioProcessorEditor::KeyboardControl(bool NegOrPlus)
 
 			}
 		}
+		// Used to minus off the selected object
 		else
 		{
 			for (int i = 0; i < OscSize; i++)
@@ -260,6 +264,7 @@ void VIVI_SynthAudioProcessorEditor::KeyboardControl(bool NegOrPlus)
 
 
 	case 1:
+		// Effects page adding value for selected component
 		if (NegOrPlus) {
 			for (int i = 0; i < EffectsReference->Effects.size(); i++)
 			{
@@ -315,6 +320,7 @@ void VIVI_SynthAudioProcessorEditor::KeyboardControl(bool NegOrPlus)
 				}
 			}
 		}
+		// Effects Page minus
 		else
 		{
 			for (int i = 0; i < EffectsReference->Effects.size(); i++)
@@ -359,11 +365,13 @@ void VIVI_SynthAudioProcessorEditor::KeyboardControl(bool NegOrPlus)
 				break;
 
 				}
+				// If the volume object has focus call this function
 				else if (VolumeMain == VolumeFocusMain)
 				{
 					MainComponentSelect(0, true);
 					break;
 				}
+				// If the Gate object has focus call this function
 				else if (GateMain == GateFocusMain)
 				{
 					MainComponentSelect(1, true);
@@ -375,6 +383,7 @@ void VIVI_SynthAudioProcessorEditor::KeyboardControl(bool NegOrPlus)
 	}
 }
 
+// This function is not optimised and could make a function call as an alternative
 void VIVI_SynthAudioProcessorEditor::ArrowTraverser(bool UpDown)
 {
 	// What tab is the user currently on
@@ -387,6 +396,7 @@ void VIVI_SynthAudioProcessorEditor::ArrowTraverser(bool UpDown)
 		if (UpDown) {
 			for (int i = 0; i < OscReference->Sliders.size(); i++)
 			{
+				// Looping through names to see which is pressed
 				NameOsc = OscReference->Sliders[i]->getName();
 				FocusOsc = OscReference->Sliders[i]->getCurrentlyFocusedComponent()->getName();
 				
@@ -397,7 +407,6 @@ void VIVI_SynthAudioProcessorEditor::ArrowTraverser(bool UpDown)
 					else MainControls[0]->grabKeyboardFocus();
 					break;
 				}
-
 				// Main Sliders Focus
 				else if (VolumeMain == VolumeFocusMain)
 				{
@@ -453,20 +462,29 @@ void VIVI_SynthAudioProcessorEditor::ArrowTraverser(bool UpDown)
 			}
 			break;
 		}
+
+	// Effects Page references
 	case 1:
+
+		// If up button pressed
 		if (UpDown) {
 			for (int i = 0; i < EffectsReference->Effects.size(); i++)
 			{
-				
+				// Main effects page references
 				NameEffects = EffectsReference->Effects[i]->getName();
 				FocusEffects = EffectsReference->Effects[i]->getCurrentlyFocusedComponent()->getName();
+
+				// Main Freeze Controls
 				FreezeEffects = EffectsReference->Freeze.getName();
 				FreezeFocusEffects = EffectsReference->Freeze.getCurrentlyFocusedComponent()->getName();
+				
+				// Volume and Gate Controls
 				VolumeMain = MainControls[0]->getName();
 				VolumeFocusMain = MainControls[0]->getCurrentlyFocusedComponent()->getName();
 				GateMain = MainControls[1]->getName();
 				GateFocusMain = MainControls[1]->getCurrentlyFocusedComponent()->getName();
 
+				// Rotating through effects and main components.
 				if (NameEffects == FocusEffects)
 				{
 					if (i < 5)
@@ -499,7 +517,7 @@ void VIVI_SynthAudioProcessorEditor::ArrowTraverser(bool UpDown)
 			}
 			break;
 		}
-		
+		// Down arrow reverse through list of components and give focus
 		else
 		{
 			
@@ -542,7 +560,6 @@ void VIVI_SynthAudioProcessorEditor::ArrowTraverser(bool UpDown)
 					EffectsReference->Effects[5]->grabKeyboardFocus();
 					break;
 				}
-				
 			}
 			break;
 
@@ -553,27 +570,32 @@ void VIVI_SynthAudioProcessorEditor::ArrowTraverser(bool UpDown)
 // Code to slect betwen the Gate and Volume control and +/-
 // MainComp selects between volume 0 and gate 1
 // PlusNeg if false +--------if true +
+
+// Changing Volume and Gate controls throughkeyboard commands
 void VIVI_SynthAudioProcessorEditor::MainComponentSelect(int MainComp, bool PlusNeg)
 {
+	// If 0 select volume, else if 1 gate
 	switch (MainComp)
 	{
 	case 0:
+			// if left arrow -0.5 if right arrow +0.5 to the volume
 			MainValue = MainControls[0]->getValue();
 			if (PlusNeg) NewValue = MainValue - 0.05;
-			else NewValue = MainValue + 0.05;
+			else NewValue = MainValue + 0.5;
 			MainControls[0]->setValue(NewValue);
 			break;
 
 	case 1:
+			// if left arrow -0.5 if right arrow +0.5 to the Gate
 			MainValue = MainControls[1]->getValue();
-			if (PlusNeg) NewValue = MainValue - 0.05;
-			else NewValue = MainValue + 0.05;
+			if (PlusNeg) NewValue = MainValue - 0.5;
+			else NewValue = MainValue + 0.5;
 			MainControls[1]->setValue(NewValue);
 			break;
 	}
 
 }
-
+// Grabbing focus for components if keypress hit
 void VIVI_SynthAudioProcessorEditor::KeyboardCommandsForPages
 (int TabIndex, int SliderRef)
 {
@@ -598,8 +620,9 @@ void VIVI_SynthAudioProcessorEditor::resized()
 	Tab.setTabBarDepth(TabDepth);
 }
 
-
-// Mute Button On and off
+/*
+// Not enough time to implment
+// Mute Button On and off Not enough time to finish
 void VIVI_SynthAudioProcessorEditor::buttonClicked(juce::Button* toggledButton)
 {
 	if (toggledButton == &Mute)
@@ -618,12 +641,10 @@ void VIVI_SynthAudioProcessorEditor::buttonClicked(juce::Button* toggledButton)
 			DBG(ProcessorState);
 		}
 	}
-
 }
-
+*/
  
-// Settings Page
-
+/*
 void SettingsPage::buttonClicked(juce::Button* Button)
 {
 	if (Button == ThemeContainer[0])
@@ -640,14 +661,12 @@ void SettingsPage::buttonClicked(juce::Button* Button)
 		}
 	}
 }
-
-// This implementation for listeners is less than ideal
-// Repeatition doesn't legitamise this poor implmentation of slider listeners for focus
-// The for loop is nice though
+*/
 
 // Main Control Listener
 void VIVI_SynthAudioProcessorEditor::sliderValueChanged(juce::Slider* sliderThatMoved)
 {
+	// Same as the Oscillator page
 	for (int i = 0; i < MainControls.size(); i++)
 	{
 		if (sliderThatMoved == MainControls[i])
@@ -678,7 +697,7 @@ void OscillatorPage::sliderValueChanged(juce::Slider* sliderThatMoved)
 		}
 	}
 }
-// Effects Listener
+// Effects Listener same as the Oscillator
 void EffectsPage::sliderValueChanged(juce::Slider* sliderThatMoved)
 {
 	for (int i = 0; i < Effects.size(); i++)
@@ -701,7 +720,7 @@ void EffectsPage::buttonClicked(juce::Button* Button)
 	if (Button == &Freeze)
 	{	
 		bool Out = Button->getToggleState();
-		if (Out == true) Freeze.setButtonText("Frozen");
-		else Freeze.setButtonText("Unfrozen");
+		if (Out == true) Freeze.setButtonText("Unfrozen");
+		else Freeze.setButtonText("Frozen");
 	}
 }
