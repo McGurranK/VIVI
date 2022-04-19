@@ -23,6 +23,7 @@ VIVI_SynthAudioProcessorEditor::VIVI_SynthAudioProcessorEditor
     : AudioProcessorEditor (&p), audioProcessor (p)  ,
 	Tab (juce::TabbedButtonBar::Orientation::TabsAtTop), Theme(T)
 {
+	setWantsKeyboardFocus(true);
 	setSize(1000, 700);      // Window Size
 
 	// Setting up object dimenstions
@@ -130,16 +131,20 @@ void VIVI_SynthAudioProcessorEditor::paint(juce::Graphics& g)
 // Key press listener
 bool VIVI_SynthAudioProcessorEditor::keyPressed(const juce::KeyPress & press)
 {
+
 	// Main Navigation and Control
-	if (press == 'V') MainControls[0]->grabKeyboardFocus();
+	//VOLUME, GATE, M
+	if (press.isKeyCurrentlyDown(press.createFromDescription("V").getKeyCode()))
+	{
+		MainControls[0]->grabKeyboardFocus();
+	}
 	else if (press == 'G') MainControls[1]->grabKeyboardFocus();
-	else if (press == 'M') Mute.grabKeyboardFocus();
 	else if (press == 'O') Tab.setCurrentTabIndex(0);
 	else if (press == 'E') Tab.setCurrentTabIndex(1);
 	// else if (press == 'L') Tab.setCurrentTabIndex(2);
 
 	// Oscillator Page
-	else if (press == ',')KeyboardCommandsForPages(0,0);
+	else if (press == ',')KeyboardCommandsForPages(0, 0);
 	else if (press == '.') KeyboardCommandsForPages(0, 1);
 	else if (press == '/') KeyboardCommandsForPages(0, 2);
 	else if (press == ';') KeyboardCommandsForPages(0, 3);
@@ -149,24 +154,34 @@ bool VIVI_SynthAudioProcessorEditor::keyPressed(const juce::KeyPress & press)
 
 	// Effects Page
 	if (press == 'R')	   KeyboardCommandsForPages(1, 0);
-	else if (press == 'B') KeyboardCommandsForPages(1, 1);
+	else if (press.isKeyCurrentlyDown(press.createFromDescription("B").getKeyCode()))
+	{ KeyboardCommandsForPages(1, 1); }
 	else if (press == 'D') KeyboardCommandsForPages(1, 2);
 	else if (press == 'A') KeyboardCommandsForPages(1, 3);
 	else if (press == 'C') KeyboardCommandsForPages(1, 4);
 	else if (press == 'Q') KeyboardCommandsForPages(1, 5);
-	else if (press == 'F') 
-	{ 
+	else if (press == 'F')
+	{
 		Tab.setCurrentTabIndex(1);
 		Tab.grabKeyboardFocus();
-		EffectsReference->Freeze.grabKeyboardFocus();
 		EffectsReference->Freeze.triggerClick();
-	}
+		EffectsReference->Freeze.grabKeyboardFocus();
 
+	}
+	else if (press.isKeyCurrentlyDown(press.leftKey))
+	{
+		DBG("Print");
+	}
 	// Increasing and decreasing value with keys/ Up and Down
-	else if (press == juce::KeyPress::rightKey)KeyboardControl(true);
-	else if (press == juce::KeyPress::leftKey)KeyboardControl(false);
-	else if (press == juce::KeyPress::upKey) ArrowTraverser(true);
-	else if (press == juce::KeyPress::downKey) ArrowTraverser(false);
+
+	else if (press == 'I')KeyboardControl(true);
+	else if (press == 'U')KeyboardControl(false);
+	else if (press == '=')
+	{
+		ArrowTraverser(true);
+
+	}
+	else if (press == '-') ArrowTraverser(false);
 
 	return 0;
 }
@@ -197,11 +212,13 @@ void VIVI_SynthAudioProcessorEditor::KeyboardControl(bool NegOrPlus)
 					{
 						NewValue = OscValue + 0.05;
 						OscReference->Sliders[i]->setValue(NewValue);
+						break;
 					}
 					else
 					{
 						NewValue = OscValue + 1.0;
 						OscReference->Sliders[i]->setValue(NewValue);
+						
 					}
 
 					break;
@@ -220,7 +237,7 @@ void VIVI_SynthAudioProcessorEditor::KeyboardControl(bool NegOrPlus)
 			}
 		}
 		// Used to minus off the selected object
-		else
+		else if (NegOrPlus)
 		{
 			for (int i = 0; i < OscSize; i++)
 			{
@@ -393,31 +410,47 @@ void VIVI_SynthAudioProcessorEditor::ArrowTraverser(bool UpDown)
 	{
 	case 0:
 		// If upbutton pressed
-		if (UpDown) {
-			for (int i = 0; i < OscReference->Sliders.size(); i++)
+		if (UpDown) 
+		{
+
+			FocusedObject = OscReference->getCurrentlyFocusedComponent();
+			// Foward keypress oscillator one to gate
+			if (OscReference->Sliders[0]->getName() == FocusedObject->getName()) 
 			{
-				// Looping through names to see which is pressed
-				NameOsc = OscReference->Sliders[i]->getName();
-				FocusOsc = OscReference->Sliders[i]->getCurrentlyFocusedComponent()->getName();
+				OscReference->Sliders[1]->grabKeyboardFocus();
 				
-				// Oscillator and spread Sliders Focus
-				if (NameOsc == FocusOsc)
-				{
-					if (i < 6) OscReference->Sliders[i + 1]->grabKeyboardFocus();
-					else MainControls[0]->grabKeyboardFocus();
-					break;
-				}
-				// Main Sliders Focus
-				else if (VolumeMain == VolumeFocusMain)
-				{
-					MainControls[1]->grabKeyboardFocus();
-					break;
-				}
-				else if (GateMain == GateFocusMain)
-				{
-					OscReference->Sliders[0]->grabKeyboardFocus();
-					break;
-				}				
+			}
+			else if (OscReference->Sliders[1]->getName() == FocusedObject->getName())
+			{
+				OscReference->Sliders[2]->grabKeyboardFocus();
+			}
+			else if (OscReference->Sliders[2]->getName() == FocusedObject->getName())
+			{
+				OscReference->Sliders[3]->grabKeyboardFocus();
+			}
+			else if (OscReference->Sliders[3]->getName() == FocusedObject->getName())
+			{
+				OscReference->Sliders[4]->grabKeyboardFocus();
+			}
+			else if (OscReference->Sliders[4]->getName() == FocusedObject->getName())
+			{
+				OscReference->Sliders[5]->grabKeyboardFocus();
+			}
+			else if (OscReference->Sliders[5]->getName() == FocusedObject->getName())
+			{
+				OscReference->Sliders[6]->grabKeyboardFocus();
+			}
+			else if (OscReference->Sliders[6]->getName() == FocusedObject->getName())
+			{
+				MainControls[0]->grabKeyboardFocus();
+			}
+			else if (MainControls[0]->getName() == FocusedObject->getName())
+			{
+				MainControls[1]->grabKeyboardFocus();
+			}
+			else if (MainControls[1]->getName() == FocusedObject->getName())
+			{
+				OscReference->Sliders[0]->grabKeyboardFocus();
 			}
 			break;
 		}

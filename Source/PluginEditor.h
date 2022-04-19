@@ -53,6 +53,8 @@ public:
 	double NewValue{ 0 }, OscValue{ 0 }, EffectsValue{0}, Effects{ 0 }
 	, MainValue{0};
 	
+	juce::Component *FocusedObject;
+
 	juce::String Name, Focus, NameOsc, FocusOsc,
 		// Juce Strings For Effects Page
 		NameEffects, FocusEffects, FreezeEffects, FreezeFocusEffects, VolumeMain,
