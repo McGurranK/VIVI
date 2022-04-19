@@ -14,8 +14,18 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-VIVI_SynthAudioProcessor::VIVI_SynthAudioProcessor() :m_CurrentBufferSize(0) 
+VIVI_SynthAudioProcessor::VIVI_SynthAudioProcessor() 
+#ifndef JucePlugin_PreferredChannelConfigurations
+	:m_CurrentBufferSize(0), AudioProcessor(BusesProperties()
+#if ! JucePlugin_IsMidiEffect
+#if ! JucePlugin_IsSynth
+		.withInput("Input", juce::AudioChannelSet::stereo(), true)
+#endif
+		.withOutput("Output", juce::AudioChannelSet::stereo(), true)
+#endif
+	)
 
+#endif
 {
 	// use a default samplerate and vector size here, reset it later
 	m_C74PluginState = (CommonState *)C74_GENPLUGIN::create(44100, 64);
@@ -35,6 +45,7 @@ VIVI_SynthAudioProcessor::VIVI_SynthAudioProcessor() :m_CurrentBufferSize(0)
 		auto name = juce::String(C74_GENPLUGIN::getparametername(m_C74PluginState, i));
 		apvts.addParameterListener(name, this);
 	}
+
 }
 
 VIVI_SynthAudioProcessor::~VIVI_SynthAudioProcessor()
@@ -188,6 +199,32 @@ void VIVI_SynthAudioProcessor::releaseResources()
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
 }
+
+#ifndef JucePlugin_PreferredChannelConfigurations
+bool VIVI_SynthAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
+{
+#if JucePlugin_IsMidiEffect
+	juce::ignoreUnused(layouts);
+	return true;
+#else
+	// This is the place where you check if the layout is supported.
+	// In this template code we only support mono or stereo.
+	// Some plugin hosts, such as certain GarageBand versions, will only
+	// load plugins that support stereo bus layouts.
+	if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
+		&& layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+		return false;
+
+	// This checks if the input layout matches the output layout
+#if ! JucePlugin_IsSynth
+	if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
+		return false;
+#endif
+
+	return true;
+#endif
+}
+#endif
 
 void VIVI_SynthAudioProcessor::processBlock (juce::AudioSampleBuffer& buffer, juce::MidiBuffer& midiMessages)
 {
