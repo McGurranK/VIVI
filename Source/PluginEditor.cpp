@@ -606,16 +606,16 @@ void VIVI_SynthAudioProcessorEditor::MainComponentSelect(int MainComp, bool Plus
 	case 0:
 			// if left arrow -0.5 if right arrow +0.5 to the volume
 			MainValue = MainControls[0]->getValue();
-			if (PlusNeg) NewValue = MainValue - 0.05;
-			else NewValue = MainValue + 0.5;
+			if (PlusNeg) NewValue = MainValue - 1;
+			else NewValue = MainValue + 1;
 			MainControls[0]->setValue(NewValue);
 			break;
 
 	case 1:
 			// if left arrow -0.5 if right arrow +0.5 to the Gate
 			MainValue = MainControls[1]->getValue();
-			if (PlusNeg) NewValue = MainValue - 0.5;
-			else NewValue = MainValue + 0.5;
+			if (PlusNeg) NewValue = MainValue - 1;
+			else NewValue = MainValue + 1;
 			MainControls[1]->setValue(NewValue);
 			break;
 	}
