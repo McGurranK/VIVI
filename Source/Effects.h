@@ -41,6 +41,7 @@ juce::Slider::Listener
 			Effects[i]->setHasFocusOutline(true);
 			Effects[i]->setDescription(EffectsNames[i]);
 			Effects[i]->setName(EffectsNames[i]);
+			Effects[i]->setTitle(EffectsNames[i]);
 			Effects[i]->addListener(this);
 			
 			Freeze.addListener(this);

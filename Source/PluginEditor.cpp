@@ -168,20 +168,13 @@ bool VIVI_SynthAudioProcessorEditor::keyPressed(const juce::KeyPress & press)
 		EffectsReference->Freeze.grabKeyboardFocus();
 
 	}
-	else if (press.isKeyCurrentlyDown(press.leftKey))
-	{
-		DBG("Print");
-	}
+
 	// Increasing and decreasing value with keys/ Up and Down
 
-	else if (press == 'I')KeyboardControl(true);
-	else if (press == 'U')KeyboardControl(false);
-	else if (press == '=')
-	{
-		ArrowTraverser(true);
-
-	}
-	else if (press == '-') ArrowTraverser(false);
+	else if (press == juce::KeyPress::rightKey)KeyboardControl(true);
+	else if (press == juce::KeyPress::leftKey) KeyboardControl(false);
+	else if (press == juce::KeyPress::upKey) ArrowTraverser(true);
+	else if (press == juce::KeyPress::downKey) ArrowTraverser(false);
 
 	return 0;
 }
@@ -237,7 +230,7 @@ void VIVI_SynthAudioProcessorEditor::KeyboardControl(bool NegOrPlus)
 			}
 		}
 		// Used to minus off the selected object
-		else if (NegOrPlus)
+		else
 		{
 			for (int i = 0; i < OscSize; i++)
 			{
