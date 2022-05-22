@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 /*
   ==============================================================================
 
@@ -12,8 +14,18 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-VIVI_SynthAudioProcessor::VIVI_SynthAudioProcessor()
-:m_CurrentBufferSize(0)
+VIVI_SynthAudioProcessor::VIVI_SynthAudioProcessor() 
+#ifndef JucePlugin_PreferredChannelConfigurations
+	:m_CurrentBufferSize(0), AudioProcessor(BusesProperties()
+#if ! JucePlugin_IsMidiEffect
+#if ! JucePlugin_IsSynth
+		.withInput("Input", juce::AudioChannelSet::stereo(), true)
+#endif
+		.withOutput("Output", juce::AudioChannelSet::stereo(), true)
+#endif
+	)
+
+#endif
 {
 	// use a default samplerate and vector size here, reset it later
 	m_C74PluginState = (CommonState *)C74_GENPLUGIN::create(44100, 64);
@@ -28,11 +40,18 @@ VIVI_SynthAudioProcessor::VIVI_SynthAudioProcessor()
 	for (int i = 0; i < C74_GENPLUGIN::num_outputs(); i++) {
 		m_OutputBuffers[i] = NULL;
 	}
+	for (int i = 0; i < C74_GENPLUGIN::num_params(); ++i)
+	{
+		auto name = juce::String(C74_GENPLUGIN::getparametername(m_C74PluginState, i));
+		apvts.addParameterListener(name, this);
+	}
 
 }
 
 VIVI_SynthAudioProcessor::~VIVI_SynthAudioProcessor()
 {
+	delete m_InputBuffers;
+	delete m_OutputBuffers;
 	C74_GENPLUGIN::destroy(m_C74PluginState);
 }
 
@@ -47,6 +66,7 @@ int VIVI_SynthAudioProcessor::getNumParameters()
 	return C74_GENPLUGIN::num_params();
 }
 
+// Get parameter Value
 float VIVI_SynthAudioProcessor::getParameter (int index)
 {
 	t_param value;
@@ -60,29 +80,34 @@ float VIVI_SynthAudioProcessor::getParameter (int index)
 	return value;
 }
 
+// Setting parameter values
 void VIVI_SynthAudioProcessor::setParameter (int index, float newValue)
 {
+	
 	t_param min = C74_GENPLUGIN::getparametermin(m_C74PluginState, index);
+
 	t_param range = fabs(C74_GENPLUGIN::getparametermax(m_C74PluginState, index) - min);
+
 	t_param value = newValue * range + min;
 	
 	C74_GENPLUGIN::setparameter(m_C74PluginState, index, value, NULL);
 }
-
+// Get name of parametr
 const juce::String VIVI_SynthAudioProcessor::getParameterName (int index)
 {
     return juce::String(C74_GENPLUGIN::getparametername(m_C74PluginState, index));
 }
 
+// 
 const juce::String VIVI_SynthAudioProcessor::getParameterText (int index)
 {
 	juce::String text = juce::String(getParameter(index));
-	text += juce::String(" ");
+	text += juce::String("");
 	text += juce::String(C74_GENPLUGIN::getparameterunits(m_C74PluginState, index));
 
 	return text;
 }
-
+//
 const juce::String VIVI_SynthAudioProcessor::getInputChannelName (int channelIndex) const
 {
     return juce::String (channelIndex + 1);
@@ -169,23 +194,50 @@ void VIVI_SynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 	m_C74PluginState->vs = samplesPerBlock;
 
 	assureBufferSize(samplesPerBlock);
+
 }
 
 void VIVI_SynthAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
+
 }
+
+#ifndef JucePlugin_PreferredChannelConfigurations
+bool VIVI_SynthAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
+{
+#if JucePlugin_IsMidiEffect
+	juce::ignoreUnused(layouts);
+	return true;
+#else
+	// This is the place where you check if the layout is supported.
+	// In this template code we only support mono or stereo.
+	// Some plugin hosts, such as certain GarageBand versions, will only
+	// load plugins that support stereo bus layouts.
+	if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
+		&& layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+		return false;
+
+	// This checks if the input layout matches the output layout
+#if ! JucePlugin_IsSynth
+	if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
+		return false;
+#endif
+
+	return true;
+#endif
+}
+#endif
 
 void VIVI_SynthAudioProcessor::processBlock (juce::AudioSampleBuffer& buffer, juce::MidiBuffer& midiMessages)
 {
 	assureBufferSize(buffer.getNumSamples());
+
 	
 	// fill input buffers
 	for (int i = 0; i < C74_GENPLUGIN::num_inputs(); i++) {
 		if (i < getNumInputChannels()) {
 			for (int j = 0; j < m_CurrentBufferSize; j++) {
-				m_InputBuffers[i][j] = buffer.getReadPointer(i)[j];
+				m_InputBuffers[i][j] = (buffer.getReadPointer(i)[j])*2;
 			}
 		} else {
 			memset(m_InputBuffers[i], 0, m_CurrentBufferSize *  sizeof(double));
@@ -204,7 +256,7 @@ void VIVI_SynthAudioProcessor::processBlock (juce::AudioSampleBuffer& buffer, ju
 	for (int i = 0; i < getNumOutputChannels(); i++) {
 		if (i < C74_GENPLUGIN::num_outputs()) {
 			for (int j = 0; j < buffer.getNumSamples(); j++) {
-				buffer.getWritePointer(i)[j] =(float) m_OutputBuffers[i][j];
+				buffer.getWritePointer(i)[j] =(float) (m_OutputBuffers[i][j]);
 			}
 		} else {
 			buffer.clear (i, 0, buffer.getNumSamples());
@@ -221,27 +273,23 @@ bool VIVI_SynthAudioProcessor::hasEditor() const
 juce::AudioProcessorEditor* VIVI_SynthAudioProcessor::createEditor()
 {	
 	
-	return new VIVI_SynthAudioProcessorEditor(*this);
-	/*
-    return new juce::GenericAudioProcessorEditor(this);
-	*/
+	return new VIVI_SynthAudioProcessorEditor(*this,Themes());
+	
+    //return new juce::GenericAudioProcessorEditor(this);
+	
 }
 
 //==============================================================================
+// Save States
 void VIVI_SynthAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 	
-	char *state;
-	size_t statesize = C74_GENPLUGIN::getstatesize(m_C74PluginState);
-	state = (char *)malloc(sizeof(char) * statesize);
-	
-	C74_GENPLUGIN::getstate(m_C74PluginState, state);
-	destData.replaceWith(state, sizeof(char) * statesize);
+	destData.setSize(C74_GENPLUGIN::getstatesize(m_C74PluginState), false);
+	C74_GENPLUGIN::getstate(m_C74PluginState,(char*) destData.getData());
 
-	if (state) free(state);
 }
 
 void VIVI_SynthAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -260,6 +308,38 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 //==============================================================================
 // C74 added methods
+void VIVI_SynthAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue)
+{
+	auto index = apvts.getParameter(parameterID)->getParameterIndex();
+	C74_GENPLUGIN::setparameter(m_C74PluginState, index, newValue, nullptr);
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout VIVI_SynthAudioProcessor::createParameterLayout()
+{
+	m_C74PluginState = (CommonState*)C74_GENPLUGIN::create(44100, 64);
+	C74_GENPLUGIN::reset(m_C74PluginState);
+
+	juce::AudioProcessorValueTreeState::ParameterLayout layout;
+
+	for (int i = 0; i < C74_GENPLUGIN::num_params(); ++i)
+	{
+		auto name = juce::String(C74_GENPLUGIN::getparametername(m_C74PluginState, i));
+		auto min = C74_GENPLUGIN::getparametermin(m_C74PluginState, i);
+		auto max = C74_GENPLUGIN::getparametermax(m_C74PluginState, i);
+		auto defaultValue = m_C74PluginState->params[i].defaultvalue;
+
+		layout.add(std::make_unique<juce::AudioParameterFloat>(name, name,
+			juce::NormalisableRange<float>(min, max, 0.01f, 1.f),
+			defaultValue,
+			juce::String(),
+			juce::AudioProcessorParameter::genericParameter,
+			nullptr,
+			nullptr));
+	}
+
+
+	return layout;
+}
 
 void VIVI_SynthAudioProcessor::assureBufferSize(long bufferSize)
 {
@@ -275,4 +355,5 @@ void VIVI_SynthAudioProcessor::assureBufferSize(long bufferSize)
 		
 		m_CurrentBufferSize = bufferSize;
 	}
+
 }

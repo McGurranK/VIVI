@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "gen_exported.h"
 
 namespace C74_GENPLUGIN {
@@ -827,7 +829,7 @@ void *create(t_param sr, long vs) {
 	pi->inputmax = 1;
 	pi->hasminmax = true;
 	pi->outputmin = 0;
-	pi->outputmax = 1000;
+	pi->outputmax = 200;
 	pi->exp = 0;
 	pi->units = "";		// no units defined
 	// initialize parameter 1 ("m_Bitcrush_25")
@@ -855,7 +857,7 @@ void *create(t_param sr, long vs) {
 	pi->inputmax = 1;
 	pi->hasminmax = true;
 	pi->outputmin = 0;
-	pi->outputmax = 44100;
+	pi->outputmax = 200;
 	pi->exp = 0;
 	pi->units = "";		// no units defined
 	// initialize parameter 3 ("m_FilterCutOff_28")
@@ -868,7 +870,7 @@ void *create(t_param sr, long vs) {
 	pi->inputmin = 0;
 	pi->inputmax = 1;
 	pi->hasminmax = true;
-	pi->outputmin = 1000;
+	pi->outputmin = 20;
 	pi->outputmax = 20000;
 	pi->exp = 0;
 	pi->units = "";		// no units defined
