@@ -66,6 +66,7 @@ int VIVI_SynthAudioProcessor::getNumParameters()
 	return C74_GENPLUGIN::num_params();
 }
 
+// Get parameter Value
 float VIVI_SynthAudioProcessor::getParameter (int index)
 {
 	t_param value;
@@ -79,6 +80,7 @@ float VIVI_SynthAudioProcessor::getParameter (int index)
 	return value;
 }
 
+// Setting parameter values
 void VIVI_SynthAudioProcessor::setParameter (int index, float newValue)
 {
 	
@@ -90,12 +92,13 @@ void VIVI_SynthAudioProcessor::setParameter (int index, float newValue)
 	
 	C74_GENPLUGIN::setparameter(m_C74PluginState, index, value, NULL);
 }
-
+// Get name of parametr
 const juce::String VIVI_SynthAudioProcessor::getParameterName (int index)
 {
     return juce::String(C74_GENPLUGIN::getparametername(m_C74PluginState, index));
 }
 
+// 
 const juce::String VIVI_SynthAudioProcessor::getParameterText (int index)
 {
 	juce::String text = juce::String(getParameter(index));
@@ -104,7 +107,7 @@ const juce::String VIVI_SynthAudioProcessor::getParameterText (int index)
 
 	return text;
 }
-
+//
 const juce::String VIVI_SynthAudioProcessor::getInputChannelName (int channelIndex) const
 {
     return juce::String (channelIndex + 1);
@@ -196,8 +199,7 @@ void VIVI_SynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 
 void VIVI_SynthAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
+
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -278,6 +280,7 @@ juce::AudioProcessorEditor* VIVI_SynthAudioProcessor::createEditor()
 }
 
 //==============================================================================
+// Save States
 void VIVI_SynthAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
